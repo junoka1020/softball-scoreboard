@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大会写真ギャラリー</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Hiragino Kaku Gothic Pro', 'メイリオ', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        header { text-align: center; color: white; margin-bottom: 20px; }
+        
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .status-bar {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .update-time { font-size: 0.9em; }
+        
+        .refresh-btn {
+            background: white;
+            border: none;
+            color: #667eea;
+            padding: 5px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .refresh-btn:active { transform: scale(0.95); }
+        
+        .nav { text-align: center; margin-bottom: 20px; margin-top: 20px; }
+        
+        .nav a {
+            display: inline-block;
+            padding: 12px 30px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        .nav a:hover { transform: translateY(-2px); }
+        
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .photo-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            transition: transform 0.3s;
+            cursor: pointer;
+            position: relative;
+            aspect-ratio: 4/3; /* 画像の比率を固定 */
+        }
+        
+        .photo-card:hover { transform: translateY(-5px); }
+        
+        .photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* 画像読み込みエラー時の表示 */
+        .img-error {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #f0f0f0;
+            color: #888;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .photo-info-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            padding: 20px 15px 10px;
+            color: white;
+            font-size: 0.9em;
+        }
+        
+        .loading, .no-photos {
+            text-align: center;
+            padding: 60px;
+            color: white;
+            font-size: 1.2em;
+            grid-column: 1 / -1;
+        }
+        
+        /* モーダル */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.active { display: flex; animation: fadeIn 0.3s; }
+        
+        .modal-content {
+            max-width: 95%;
+            max-height: 90%;
+            position: relative;
+        }
+        
+        .modal-content img {
+            max-width: 100%;
+            max-height: 85vh;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .view-original-btn {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            color: white;
+            text-decoration: none;
+            border: 1px solid white;
+            padding: 8px 20px;
+            border-radius: 20px;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 35px;
+            cursor: pointer;
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 1.5em; }
+            .photo-grid {
+                grid-template-columns: repeat(2, 1fr); /* スマホは2列 */
+                gap: 10px;
+            }
+            .status-bar { font-size: 0.8em; flex-direction: column; gap: 5px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📸 大会フォトギャラリー</h1>
+            <div class="status-bar">
+                <span id="updateTime">読み込み中...</span>
+                <button class="refresh-btn" onclick="fetchPhotos()">🔄 更新</button>
+            </div>
+        </header>
+        
+        <div class="nav">
+            <a href="index.html">📊 スコアボードへ</a>
+        </div>
+        
+        <div class="photo-grid" id="photoGrid">
+            <div class="loading">
+                写真を読み込んでいます...<br>
+                <small>※枚数が多いと時間がかかります</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <img id="modalImage" src="" alt="拡大写真">
+            <a id="originalLink" href="#" target="_blank" class="view-original-btn">Driveで元画像を見る</a>
+        </div>
+    </div>
+
+    <script>
+        // ★★★ ここに観客用BotのウェブアプリURLを貼り付け ★★★
+        // 「デプロイ」→「Webアプリ」→「URL」をコピー
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyuzbb9txRNAsHRbVcmmB17tROBnOii87QtP13KcfoTMk4tSLeJ9tmT5IwHUHa1omS6uw/exec';
+        
+        // 写真データ取得
+        async function fetchPhotos() {
+            const grid = document.getElementById('photoGrid');
+            const updateTimeEl = document.getElementById('updateTime');
+            
+            // 読み込み中表示（初回のみ）
+            if(grid.children.length === 0) {
+                grid.innerHTML = '<div class="loading">読み込み中...</div>';
+            }
+            updateTimeEl.textContent = '更新中...';
+
+            try {
+                // キャッシュ回避のためにパラメータ付与
+                const response = await fetch(`${API_URL}?t=${new Date().getTime()}`);
+                const data = await response.json();
+                
+                displayPhotos(data);
+                
+                updateTimeEl.textContent = `最終更新: ${data.lastUpdate} (${data.photos.length}枚)`;
+            } catch (error) {
+                console.error('データ取得エラー:', error);
+                grid.innerHTML = `
+                    <div class="no-photos">
+                        読み込みに失敗しました。<br>
+                        <button class="refresh-btn" style="margin-top:10px" onclick="fetchPhotos()">再読み込み</button>
+                    </div>`;
+                updateTimeEl.textContent = 'エラー';
+            }
+        }
+        
+        // 写真表示
+        function displayPhotos(data) {
+            const grid = document.getElementById('photoGrid');
+            
+            if (!data.photos || data.photos.length === 0) {
+                grid.innerHTML = '<div class="no-photos">写真はまだありません📷<br>LINE Botに写真を送ってください!</div>';
+                return;
+            }
+            
+            // 既存の要素と比較して変更がなければ何もしない（ちらつき防止）
+            // ※簡易実装のため今回は全書き換えします
+            
+            let html = '';
+            data.photos.forEach(photo => {
+                html += `
+                    <div class="photo-card" onclick="openModal('${photo.url}')">
+                        <img src="${photo.url}" loading="lazy" alt="大会写真" onerror="this.parentElement.innerHTML='<div class=\\'img-error\\'>⚠️ 表示できません<br><small>クリックしてDriveで確認</small></div>'">
+                        <div class="photo-info-overlay">
+                            <span>${photo.timestamp}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            grid.innerHTML = html;
+        }
+        
+        // モーダル表示
+        function openModal(imageUrl) {
+            const modal = document.getElementById('modal');
+            const modalImg = document.getElementById('modalImage');
+            const linkBtn = document.getElementById('originalLink');
+            
+            modalImg.src = imageUrl;
+            linkBtn.href = imageUrl; // Driveの直接リンク
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // 背景スクロール禁止
+        }
+        
+        // モーダル閉じる
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        // イベントリスナー
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+        
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target.id === 'modal') closeModal();
+        });
+        
+        // 初回読み込み
+        fetchPhotos();
+        
+        // 自動更新（1分間隔に変更して負荷軽減）
+        setInterval(fetchPhotos, 60000);
+    </script>
+</body>
+</html>
