@@ -5,44 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ソフトボール大会 スコアボード</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: 'Hiragino Kaku Gothic Pro', 'メイリオ', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            color: #333;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1200px; margin: 0 auto; }
         
         header {
             text-align: center;
             color: white;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         
         h1 {
-            font-size: 2.5em;
+            font-size: 2.2em;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
-        .update-time {
-            font-size: 1.1em;
-            opacity: 0.9;
+        /* ステータスバー（更新ボタン周り） */
+        .status-bar {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            backdrop-filter: blur(5px);
+            margin-bottom: 20px;
         }
         
+        .update-time { font-size: 0.9em; color: white; }
+        
+        .refresh-btn {
+            background: white;
+            border: none;
+            color: #667eea;
+            padding: 6px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .refresh-btn:active { transform: scale(0.95); }
+        .refresh-btn:disabled { opacity: 0.7; cursor: wait; }
+
+        /* ナビゲーション */
+        .nav { text-align: center; margin-bottom: 30px; }
+        .nav-link {
+            display: inline-block;
+            padding: 12px 30px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        .nav-link:hover { transform: translateY(-2px); }
+        
+        /* コート表示エリア */
         .courts {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
             gap: 30px;
         }
         
@@ -51,261 +83,244 @@
             border-radius: 15px;
             padding: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-top: 5px solid #667eea;
         }
         
         .court-header {
             text-align: center;
-            font-size: 1.8em;
+            font-size: 1.5em;
             font-weight: bold;
             color: #667eea;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 3px solid #667eea;
+            border-bottom: 1px solid #eee;
         }
         
         .game {
-            margin-bottom: 30px;
-            padding: 15px;
+            margin-bottom: 25px;
+            padding: 10px;
             background: #f8f9fa;
             border-radius: 10px;
         }
         
         .game-title {
-            font-size: 1.3em;
+            font-size: 1.1em;
             font-weight: bold;
-            margin-bottom: 10px;
-            color: #333;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .status {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-        
-        .status.playing {
-            background: #ff6b6b;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
             color: white;
         }
+        .status.playing { background: #ff6b6b; animation: pulse 2s infinite; }
+        .status.waiting { background: #95a5a6; }
+        .status.finished { background: #2ecc71; }
         
-        .status.waiting {
-            background: #95a5a6;
-            color: white;
-        }
-        
-        .status.finished {
-            background: #2ecc71;
-            color: white;
-        }
-        
-        .scoreboard {
-            overflow-x: auto;
-        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        .scoreboard { overflow-x: auto; }
         
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            min-width: 300px;
         }
         
         th, td {
-            padding: 12px 8px;
+            padding: 8px 4px;
             text-align: center;
             border: 1px solid #ddd;
+            font-size: 0.95em;
         }
         
-        th {
-            background: #667eea;
-            color: white;
-            font-weight: bold;
-            font-size: 0.9em;
-        }
-        
-        td {
-            background: white;
-            font-size: 1.1em;
-        }
+        th { background: #667eea; color: white; font-weight: normal; }
+        td { background: white; }
         
         .team-name {
             text-align: left;
             font-weight: bold;
-            color: #333;
+            min-width: 100px;
+            padding-left: 8px;
         }
+        
+        .score-cell { font-family: monospace; font-size: 1.1em; }
+        .score-zero { color: #ccc; } /* 0点は薄く表示 */
         
         .total {
             background: #fff3cd !important;
             font-weight: bold;
-            font-size: 1.3em;
             color: #856404;
         }
         
-        .no-games {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-            font-size: 1.2em;
-        }
-        
-        .loading {
+        .loading, .no-games {
             text-align: center;
             padding: 40px;
             color: white;
-            font-size: 1.5em;
+            font-size: 1.2em;
+            grid-column: 1 / -1;
         }
         
         @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8em;
-            }
-            
-            .courts {
-                grid-template-columns: 1fr;
-            }
-            
-            th, td {
-                padding: 8px 4px;
-                font-size: 0.9em;
-            }
-            
-            .game-title {
-                font-size: 1.1em;
-            }
+            h1 { font-size: 1.6em; }
+            .courts { grid-template-columns: 1fr; }
+            .court { padding: 15px; }
+            th, td { font-size: 0.85em; padding: 6px 2px; }
+            .team-name { min-width: 80px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>⚾ ソフトボール大会 ⚾</h1>
-            <div class="update-time" id="updateTime">読み込み中...</div>
+            <h1>⚾ ソフトボール大会</h1>
+            
+            <div class="status-bar">
+                <span class="update-time" id="updateTime">未更新</span>
+                <button class="refresh-btn" id="refreshBtn" onclick="fetchScores()">🔄 更新</button>
+            </div>
         </header>
         
+        <div class="nav">
+            <a href="photos.html" class="nav-link">📸 写真ギャラリーへ</a>
+        </div>
+        
         <div class="courts" id="courts">
-            <div class="loading">データを読み込んでいます...</div>
+            <div class="loading">スコアを読み込んでいます...</div>
         </div>
     </div>
 
     <script>
-        // ★★★ ここにウェブアプリのURLを貼り付け ★★★
+        // ★★★ 注意 ★★★
+        // ここには「スタッフ用Bot（得点入力Bot）」のWebアプリURLを設定してください
         const API_URL = 'https://script.google.com/macros/s/AKfycby17_LC3yqT-_t16_nBkoXyZ7ZL8ku1cD__kCP5oF3VhVUaN3khClsffH70IaMt058/exec';
         
         // データ取得
         async function fetchScores() {
+            const btn = document.getElementById('refreshBtn');
+            const timeLabel = document.getElementById('updateTime');
+            const courtsDiv = document.getElementById('courts');
+            
+            // ボタン連打防止
+            btn.disabled = true;
+            btn.textContent = '通信中...';
+            
             try {
-                const response = await fetch(API_URL);
+                // キャッシュ回避のためにタイムスタンプ(?t=...)を付与
+                const response = await fetch(`${API_URL}?t=${new Date().getTime()}`);
                 const data = await response.json();
+                
                 displayScores(data);
                 
-                // 最終更新時刻を表示
-                document.getElementById('updateTime').textContent = 
-                    `最終更新: ${data.lastUpdate}`;
+                timeLabel.textContent = `最終更新: ${data.lastUpdate}`;
             } catch (error) {
                 console.error('データ取得エラー:', error);
-                document.getElementById('courts').innerHTML = 
-                    '<div class="no-games">データの読み込みに失敗しました</div>';
+                // 既に表示されている場合はエラーメッセージを出さず、時刻だけ更新
+                if (courtsDiv.children.length === 0 || courtsDiv.querySelector('.loading')) {
+                    courtsDiv.innerHTML = '<div class="no-games">データの読み込みに失敗しました<br>再読み込みボタンを押してください</div>';
+                }
+                timeLabel.textContent = '更新失敗';
+            } finally {
+                // ボタン復帰
+                btn.disabled = false;
+                btn.textContent = '🔄 更新';
             }
         }
         
-        // スコア表示
+        // スコア表示ロジック
         function displayScores(data) {
             const courtsDiv = document.getElementById('courts');
             
             if (!data.games || data.games.length === 0) {
-                courtsDiv.innerHTML = '<div class="no-games">まだ試合データがありません</div>';
+                courtsDiv.innerHTML = '<div class="no-games">現在、試合データはありません</div>';
                 return;
             }
             
             // コートごとにグループ化
             const courtGroups = {};
             data.games.forEach(game => {
-                const key = game.court;
-                if (!courtGroups[key]) {
-                    courtGroups[key] = {};
-                }
-                if (!courtGroups[key][game.gameNum]) {
-                    courtGroups[key][game.gameNum] = [];
-                }
-                courtGroups[key][game.gameNum].push(game);
+                if (!courtGroups[game.court]) courtGroups[game.court] = {};
+                if (!courtGroups[game.court][game.gameNum]) courtGroups[game.court][game.gameNum] = [];
+                courtGroups[game.court][game.gameNum].push(game);
             });
             
-            // HTML生成
             let html = '';
-            
-            ['A', 'B'].forEach(court => {
+            // コート順序を固定 (A -> B)
+            ['A', 'B', 'C', 'D'].forEach(court => {
                 if (!courtGroups[court]) return;
                 
                 html += `<div class="court">
                     <div class="court-header">${court}コート</div>`;
                 
                 const games = courtGroups[court];
-                const gameNums = Object.keys(games).sort((a, b) => a - b);
-                
-                gameNums.forEach(gameNum => {
+                // 第1試合、第2試合...の順にソート
+                Object.keys(games).sort((a, b) => a - b).forEach(gameNum => {
                     const teams = games[gameNum];
-                    const status = teams[0].status || '待機';
-                    
+                    // ステータス判定（チームの誰かが試合中なら試合中）
+                    const rawStatus = teams[0].status || '試合前';
                     let statusClass = 'waiting';
-                    if (status === '試合中') statusClass = 'playing';
-                    if (status === '終了') statusClass = 'finished';
+                    let statusLabel = rawStatus;
+                    
+                    if (rawStatus === '試合中') {
+                        statusClass = 'playing';
+                        statusLabel = '🔥 試合中';
+                    } else if (rawStatus === '終了') {
+                        statusClass = 'finished';
+                    }
                     
                     html += `
                         <div class="game">
                             <div class="game-title">
-                                第${gameNum}試合
-                                <span class="status ${statusClass}">${status}</span>
+                                <span>第${gameNum}試合</span>
+                                <span class="status ${statusClass}">${statusLabel}</span>
                             </div>
                             <div class="scoreboard">
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th>チーム</th>
-                                            <th>1</th>
-                                            <th>2</th>
-                                            <th>3</th>
-                                            <th>4</th>
-                                            <th>5</th>
-                                            <th>6</th>
-                                            <th>7</th>
-                                            <th>合計</th>
+                                            <th style="width:35%">チーム</th>
+                                            <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th>
+                                            <th style="width:10%">R</th>
                                         </tr>
                                     </thead>
                                     <tbody>`;
                     
                     teams.forEach(team => {
-                        html += `
-                            <tr>
-                                <td class="team-name">${team.team}</td>`;
+                        html += `<tr>
+                            <td class="team-name">${team.team}</td>`;
                         
+                        // 1回〜7回
                         for (let i = 0; i < 7; i++) {
-                            const score = team.innings[i] || 0;
-                            html += `<td>${score}</td>`;
+                            const score = team.innings[i];
+                            // 0点なら薄く、それ以外は濃く、データなし(undefined)は空欄
+                            const displayScore = (score === '' || score === undefined) ? '' : score;
+                            const zeroClass = (score === 0 || score === '0') ? 'score-zero' : '';
+                            
+                            html += `<td class="score-cell ${zeroClass}">${displayScore}</td>`;
                         }
                         
                         html += `<td class="total">${team.total || 0}</td>
                             </tr>`;
                     });
                     
-                    html += `
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>`;
+                    html += `</tbody></table></div></div>`;
                 });
-                
                 html += '</div>';
             });
             
-            courtsDiv.innerHTML = html || '<div class="no-games">試合データがありません</div>';
+            courtsDiv.innerHTML = html;
         }
         
         // 初回読み込み
         fetchScores();
         
-        // 10秒ごとに自動更新
-        setInterval(fetchScores, 10000);
+        // 自動更新 (60秒間隔に変更してサーバー負荷を軽減)
+        setInterval(fetchScores, 60000);
     </script>
 </body>
 </html>
