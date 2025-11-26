@@ -261,7 +261,16 @@
             try {
                 // キャッシュ対策: タイムスタンプをクエリパラメータに追加
                 const timestamp = new Date().getTime();
-                const response = await fetch(`${API_URL}?t=${timestamp}`);
+                const response = await fetch(`${API_URL}?t=${timestamp}`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
                 displayScores(data);
                 
@@ -271,7 +280,7 @@
             } catch (error) {
                 console.error('データ取得エラー:', error);
                 document.getElementById('courts').innerHTML = 
-                    '<div class="no-games">データの読み込みに失敗しました</div>';
+                    `<div class="no-games">データの読み込みに失敗しました<br><small>エラー: ${error.message}</small><br><button class="refresh-btn" onclick="manualRefresh()" style="margin-top:10px;">再試行</button></div>`;
             }
         }
         
