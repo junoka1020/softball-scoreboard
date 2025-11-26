@@ -173,7 +173,8 @@
         }
         
         .score-zero {
-            color: #bbb;
+            color: #333;
+            font-weight: normal;
         }
         
         .score-positive {
@@ -182,7 +183,7 @@
         }
         
         .score-empty {
-            color: #e0e0e0;
+            color: #bbb;
         }
         
         .total {
@@ -382,10 +383,10 @@
                             
                             // スコアの表示ロジック
                             if (score === null || score === undefined || score === '') {
-                                // 未プレイの回は空欄
+                                // 未プレイの回はハイフン
                                 html += `<td class="score-empty">-</td>`;
                             } else if (score === 0) {
-                                // 0点は薄い色
+                                // 0点は黒字の0
                                 html += `<td class="score-zero">0</td>`;
                             } else {
                                 // 得点ありは太字
