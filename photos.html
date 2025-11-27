@@ -195,8 +195,30 @@
     </div>
 
     <script>
-        // ★★★ ここに観客用BotのウェブアプリURLを貼り付け ★★★
-        const API_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+        // URLパラメータからAPIのURLを取得
+        const urlParams = new URLSearchParams(window.location.search);
+        const API_URL = urlParams.get('api') || localStorage.getItem('AUDIENCE_BOT_API_URL') || '';
+        
+        // URLパラメータで指定された場合はlocalStorageに保存
+        if (urlParams.get('api')) {
+            localStorage.setItem('AUDIENCE_BOT_API_URL', urlParams.get('api'));
+        }
+        
+        // APIのURLが設定されていない場合の警告
+        if (!API_URL) {
+            document.getElementById('photoGrid').innerHTML = `
+                <div class="no-photos">
+                    <h2>⚠️ API URLが設定されていません</h2>
+                    <p>以下の形式でアクセスしてください:</p>
+                    <code style="background:#f5f5f5;padding:10px;display:block;margin:10px 0;border-radius:5px;">
+                        ${window.location.origin}${window.location.pathname}?api=YOUR_API_URL
+                    </code>
+                    <p style="font-size:0.9em;color:#666;">
+                        例: ?api=https://script.google.com/macros/s/AKfycby.../exec
+                    </p>
+                </div>
+            `;
+        }
         
         // 写真データ取得
         async function fetchPhotos() {
