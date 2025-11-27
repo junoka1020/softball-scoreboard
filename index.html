@@ -405,11 +405,15 @@
                             const score = team.innings[i];
                             
                             // スコアの表示ロジック
+                            // null, undefined, '' は未到達 → ハイフン
+                            // 0 は到達済みで無得点 → 黒字の0
+                            // 1以上 は得点あり → 太字
+                            
                             if (score === null || score === undefined || score === '') {
-                                // 未プレイの回はハイフン
+                                // 未到達の回はハイフン（薄いグレー）
                                 html += `<td class="score-empty">-</td>`;
                             } else if (score === 0) {
-                                // 0点は黒字の0
+                                // 0点は黒字の0（通常フォント）
                                 html += `<td class="score-zero">0</td>`;
                             } else {
                                 // 得点ありは太字
