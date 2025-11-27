@@ -251,8 +251,31 @@
     </div>
 
     <script>
-        // ★★★ ここにウェブアプリのURLを貼り付け ★★★
-        const API_URL = 'https://script.google.com/macros/s/AKfycby17_LC3yqT-_t16_nBkoXyZ7ZL8ku1cD__kCP5oF3VhVUaN3khClsffH70IaMt058/exec';
+        // URLパラメータからAPIのURLを取得
+        const urlParams = new URLSearchParams(window.location.search);
+        const API_URL = urlParams.get('api') || localStorage.getItem('STAFF_BOT_API_URL') || '';
+        
+        // URLパラメータで指定された場合はlocalStorageに保存
+        if (urlParams.get('api')) {
+            localStorage.setItem('STAFF_BOT_API_URL', urlParams.get('api'));
+        }
+        
+        // APIのURLが設定されていない場合の警告
+        if (!API_URL) {
+            document.getElementById('courts').innerHTML = `
+                <div class="no-games">
+                    <h2>⚠️ API URLが設定されていません</h2>
+                    <p>以下の形式でアクセスしてください:</p>
+                    <code style="background:#f5f5f5;padding:10px;display:block;margin:10px 0;border-radius:5px;">
+                        ${window.location.origin}${window.location.pathname}?api=YOUR_API_URL
+                    </code>
+                    <p style="font-size:0.9em;color:#666;">
+                        例: ?api=https://script.google.com/macros/s/AKfycby.../exec
+                    </p>
+                </div>
+            `;
+        }
+        
         
         let isRefreshing = false;
         let autoRefreshInterval = null;
