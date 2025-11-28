@@ -389,17 +389,32 @@
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const API_URL = urlParams.get('api') || localStorage.getItem('STAFF_BOT_API_URL') || '';
         
+        // スタッフBOT API（スコアボード用）
+        const STAFF_API_URL = urlParams.get('staff_api') || localStorage.getItem('STAFF_BOT_API_URL') || '';
+        
+        // 観客BOT API（写真ギャラリー用）
+        const AUDIENCE_API_URL = urlParams.get('audience_api') || localStorage.getItem('AUDIENCE_BOT_API_URL') || '';
+        
+        // URLパラメータがあればlocalStorageに保存
+        if (urlParams.get('staff_api')) {
+            localStorage.setItem('STAFF_BOT_API_URL', urlParams.get('staff_api'));
+        }
+        if (urlParams.get('audience_api')) {
+            localStorage.setItem('AUDIENCE_BOT_API_URL', urlParams.get('audience_api'));
+        }
+        
+        // 下位互換性: 旧パラメータ 'api' もスタッフAPIとして扱う
         if (urlParams.get('api')) {
             localStorage.setItem('STAFF_BOT_API_URL', urlParams.get('api'));
         }
         
-        if (!API_URL) {
+        if (!STAFF_API_URL) {
             document.getElementById('content').innerHTML = `
                 <div class="no-games">
                     <h2>⚠️ API URLが設定されていません</h2>
-                    <p style="margin-top:15px;">URLパラメータでAPIを指定してください</p>
+                    <p style="margin-top:15px;">URLパラメータで以下を指定してください:</p>
+                    <p style="margin-top:10px;font-size:0.9em;">?staff_api=スタッフBOT_URL&audience_api=観客BOT_URL</p>
                 </div>
             `;
         }
@@ -440,9 +455,15 @@
         }
         
         async function fetchGalleryPhotos() {
+            if (!AUDIENCE_API_URL) {
+                console.log('観客BOT APIが設定されていません');
+                document.getElementById('galleryNote').textContent = '※ ギャラリーAPIが未設定です';
+                return;
+            }
+            
             try {
                 const timestamp = new Date().getTime();
-                const response = await fetch(`${API_URL}?t=${timestamp}`, {
+                const response = await fetch(`${AUDIENCE_API_URL}?t=${timestamp}`, {
                     method: 'GET',
                     mode: 'cors',
                     cache: 'no-cache'
@@ -506,20 +527,22 @@
         
         function openGallery() {
             const params = new URLSearchParams();
-            if (API_URL) params.set('api', API_URL);
+            if (AUDIENCE_API_URL) params.set('api', AUDIENCE_API_URL);
             window.location.href = `gallery.html?${params.toString()}`;
         }
         
         function openPage(page) {
             const params = new URLSearchParams();
-            if (API_URL) params.set('api', API_URL);
+            if (STAFF_API_URL) params.set('api', STAFF_API_URL);
             window.location.href = `${page}?${params.toString()}`;
         }
         
         async function fetchScores() {
+            if (!STAFF_API_URL) return;
+            
             try {
                 const timestamp = new Date().getTime();
-                const response = await fetch(`${API_URL}?t=${timestamp}`, {
+                const response = await fetch(`${STAFF_API_URL}?t=${timestamp}`, {
                     method: 'GET',
                     mode: 'cors',
                     cache: 'no-cache'
@@ -666,7 +689,7 @@
         
         function openScoreboard(court, gameNum) {
             const params = new URLSearchParams();
-            if (API_URL) params.set('api', API_URL);
+            if (STAFF_API_URL) params.set('api', STAFF_API_URL);
             params.set('court', court);
             params.set('game', gameNum);
             
