@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大会スケジュール</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Hiragino Kaku Gothic Pro', 'メイリオ', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        header {
+            background: white;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .back-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: #5568d3;
+        }
+        
+        h1 {
+            font-size: 1.2em;
+            color: #667eea;
+        }
+        
+        .container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .schedule-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .schedule-item:last-child {
+            border-bottom: none;
+        }
+        
+        .time {
+            font-weight: bold;
+            color: #667eea;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .event {
+            flex: 1;
+            color: #333;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .highlight-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 5px;
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        
+        .info-box-title {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+        
+        .info-box-content {
+            color: #666;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <button class="back-btn" onclick="goBack()">← 戻る</button>
+            <h1>📅 大会スケジュール</h1>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="section">
+            <div class="highlight">
+                <div class="highlight-title">📍 開催日時</div>
+                <div>2025年12月7日（日） 8:30 集合</div>
+            </div>
+            
+            <div class="highlight">
+                <div class="highlight-title">📍 開催場所</div>
+                <div>〇〇市総合運動公園 ソフトボール場</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">当日スケジュール</div>
+            
+            <div class="schedule-item">
+                <div class="time">8:30</div>
+                <div class="event">集合・受付開始</div>
+            </div>
+            
+            <div class="schedule-item">
+                <div class="time">9:00</div>
+                <div class="event">開会式<br>大会説明・注意事項</div>
+            </div>
+            
+            <div class="schedule-item">
+                <div class="time">9:30</div>
+                <div class="event">予選リーグ 開始<br>各コートで試合開始</div>
+            </div>
+            
+            <div class="schedule-item">
+                <div class="time">12:00</div>
+                <div class="event">昼食休憩（60分）</div>
+            </div>
+            
+            <div class="schedule-item">
+                <div class="time">13:00</div>
+                <div class="event">予選リーグ 再開</div>
+            </div>
+            
+            <div class="schedule-item">
+                <div class="time">15:00</div>
+                <div class="event">決勝トーナメント 開始</div>
+            </div>
+            
+            <div class="schedule-item">
+                <div class="time">17:00</div>
+                <div class="event">決勝戦</div>
+            </div>
+            
+            <div class="schedule-item">
+                <div class="time">17:30</div>
+                <div class="event">閉会式・表彰式</div>
+            </div>
+            
+            <div class="schedule-item">
+                <div class="time">18:00</div>
+                <div class="event">解散</div>
+            </div>
+            
+            <div class="info-box">
+                <div class="info-box-title">⚠️ 注意事項</div>
+                <div class="info-box-content">
+                    ・天候により時間が変更になる場合があります<br>
+                    ・予選の試合時間は1試合45分を予定<br>
+                    ・各チームは試合開始20分前に集合してください
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">持ち物リスト</div>
+            <div class="info-box-content" style="padding: 10px 0;">
+                ✓ ユニフォーム・運動靴<br>
+                ✓ グローブ・バット（チームで用意）<br>
+                ✓ 水筒・タオル<br>
+                ✓ 昼食<br>
+                ✓ 日焼け止め・帽子<br>
+                ✓ 救急用品（各自）
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const API_URL = urlParams.get('api') || localStorage.getItem('STAFF_BOT_API_URL') || '';
+        
+        function goBack() {
+            const params = new URLSearchParams();
+            if (API_URL) params.set('api', API_URL);
+            window.location.href = `index.html?${params.toString()}`;
+        }
+    </script>
+</body>
+</html>
