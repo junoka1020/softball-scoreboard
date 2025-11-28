@@ -99,6 +99,12 @@
             color: #666;
         }
         
+        .photo-author {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 5px;
+        }
+        
         .loading {
             text-align: center;
             padding: 60px;
@@ -113,6 +119,28 @@
             border-radius: 15px;
             color: #666;
             font-size: 1.3em;
+        }
+        
+        .error-box {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+        }
+        
+        .error-box h2 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+        }
+        
+        .error-box code {
+            background: #f5f5f5;
+            padding: 10px;
+            display: block;
+            margin: 10px 0;
+            border-radius: 5px;
+            word-break: break-all;
         }
         
         /* モーダル */
@@ -142,6 +170,14 @@
             width: 100%;
             height: auto;
             border-radius: 10px;
+        }
+        
+        .modal-author {
+            text-align: center;
+            color: white;
+            margin-top: 15px;
+            font-size: 0.9em;
+            opacity: 0.8;
         }
         
         .close-modal {
@@ -178,7 +214,7 @@
         </header>
         
         <div class="nav">
-            <a href="index.html">← スコアボードに戻る</a>
+            <a href="#" onclick="goBack(); return false;">← スコアボードに戻る</a>
         </div>
         
         <div class="photo-grid" id="photoGrid">
@@ -191,6 +227,7 @@
         <span class="close-modal" onclick="closeModal()">&times;</span>
         <div class="modal-content">
             <img id="modalImage" src="" alt="写真">
+            <div class="modal-author" id="modalAuthor"></div>
         </div>
     </div>
 
@@ -204,16 +241,16 @@
             localStorage.setItem('AUDIENCE_BOT_API_URL', urlParams.get('api'));
         }
         
+        console.log('API URL:', API_URL);
+        
         // APIのURLが設定されていない場合の警告
         if (!API_URL) {
             document.getElementById('photoGrid').innerHTML = `
-                <div class="no-photos">
+                <div class="error-box">
                     <h2>⚠️ API URLが設定されていません</h2>
                     <p>以下の形式でアクセスしてください:</p>
-                    <code style="background:#f5f5f5;padding:10px;display:block;margin:10px 0;border-radius:5px;">
-                        ${window.location.origin}${window.location.pathname}?api=YOUR_API_URL
-                    </code>
-                    <p style="font-size:0.9em;color:#666;">
+                    <code>${window.location.origin}${window.location.pathname}?api=YOUR_API_URL</code>
+                    <p style="font-size:0.9em;color:#666;margin-top:10px;">
                         例: ?api=https://script.google.com/macros/s/AKfycby.../exec
                     </p>
                 </div>
@@ -222,17 +259,47 @@
         
         // 写真データ取得
         async function fetchPhotos() {
+            if (!API_URL) return;
+            
             try {
-                const response = await fetch(API_URL);
+                const timestamp = new Date().getTime();
+                const fetchUrl = `${API_URL}?t=${timestamp}`;
+                console.log('Fetching from:', fetchUrl);
+                
+                const response = await fetch(fetchUrl, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache'
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
+                console.log('Data received:', data);
+                
                 displayPhotos(data);
                 
+                const photoCount = data.photos ? data.photos.length : 0;
                 document.getElementById('updateTime').textContent = 
-                    `最終更新: ${data.lastUpdate} | 投稿枚数: ${data.photos.length}枚`;
+                    `最終更新: ${data.lastUpdate || '不明'} | 投稿枚数: ${photoCount}枚`;
             } catch (error) {
                 console.error('データ取得エラー:', error);
-                document.getElementById('photoGrid').innerHTML = 
-                    '<div class="no-photos">写真の読み込みに失敗しました</div>';
+                document.getElementById('photoGrid').innerHTML = `
+                    <div class="error-box">
+                        <h2>⚠️ 写真の読み込みに失敗しました</h2>
+                        <p>エラー詳細: ${error.message}</p>
+                        <p style="margin-top:10px;">API URL: <code>${API_URL}</code></p>
+                        <p style="font-size:0.9em;color:#666;margin-top:10px;">
+                            ・API URLが正しいか確認してください<br>
+                            ・ネットワーク接続を確認してください<br>
+                            ・開発者ツールのコンソールでエラーを確認してください
+                        </p>
+                    </div>
+                `;
             }
         }
         
@@ -241,17 +308,26 @@
             const grid = document.getElementById('photoGrid');
             
             if (!data.photos || data.photos.length === 0) {
-                grid.innerHTML = '<div class="no-photos">まだ写真が投稿されていません<br>LINE Botに写真を送信してください!</div>';
+                grid.innerHTML = `
+                    <div class="no-photos">
+                        まだ写真が投稿されていません<br>
+                        <span style="font-size:0.8em;margin-top:10px;display:block;">
+                            LINE Botに写真を送信すると、ここに表示されます
+                        </span>
+                    </div>
+                `;
                 return;
             }
             
             let html = '';
             data.photos.forEach(photo => {
+                const userName = photo.userName || '投稿者';
                 html += `
-                    <div class="photo-card" onclick="openModal('${photo.fullImage}')">
+                    <div class="photo-card" onclick='openModal(${JSON.stringify(photo.fullImage)}, ${JSON.stringify(userName)})'>
                         <img src="${photo.thumbnail}" alt="大会写真" loading="lazy" onerror="this.src='${photo.fullImage}'">
                         <div class="photo-info">
                             <div class="photo-time">📷 ${photo.timestamp}</div>
+                            <div class="photo-author">撮影者: ${userName}</div>
                         </div>
                     </div>
                 `;
@@ -261,14 +337,22 @@
         }
         
         // モーダル表示
-        function openModal(imageUrl) {
+        function openModal(imageUrl, userName) {
             document.getElementById('modalImage').src = imageUrl;
+            document.getElementById('modalAuthor').textContent = `撮影者: ${userName}`;
             document.getElementById('modal').classList.add('active');
         }
         
         // モーダル閉じる
         function closeModal() {
             document.getElementById('modal').classList.remove('active');
+        }
+        
+        // 戻るボタン
+        function goBack() {
+            const params = new URLSearchParams();
+            if (API_URL) params.set('api', API_URL);
+            window.location.href = `index.html?${params.toString()}`;
         }
         
         // Escキーでモーダルを閉じる
