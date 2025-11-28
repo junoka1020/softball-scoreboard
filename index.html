@@ -500,16 +500,26 @@
                 const img = document.createElement('img');
                 img.src = photo.thumbnail;
                 img.alt = '大会写真';
+                img.loading = 'eager';
+                
+                // 画像読み込み失敗時の処理
                 img.onerror = function() {
-                    this.style.display = 'none';
-                    slide.classList.add('placeholder');
+                    console.error('画像読み込み失敗:', photo.thumbnail);
+                    // 親要素（slide）をプレースホルダーに変更
                     slide.innerHTML = '📷';
+                    slide.classList.add('placeholder');
+                };
+                
+                // 画像読み込み成功時の処理
+                img.onload = function() {
+                    console.log('画像読み込み成功:', photo.thumbnail);
                 };
                 
                 slide.appendChild(img);
                 sliderTrack.appendChild(slide);
             });
             
+            // 残りのスロットをプレースホルダーで埋める
             const remainingSlots = 5 - photosToShow.length;
             for (let i = 0; i < remainingSlots; i++) {
                 const slide = document.createElement('div');
@@ -519,6 +529,7 @@
                 sliderTrack.appendChild(slide);
             }
             
+            // スライダー再初期化
             initSlider();
             
             document.getElementById('galleryNote').textContent = 
