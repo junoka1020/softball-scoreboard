@@ -22,6 +22,9 @@
             padding: 15px;
             text-align: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
         h1 {
@@ -35,11 +38,77 @@
             margin-top: 5px;
         }
         
+        .gallery-slider {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+        
+        .gallery-title {
+            font-size: 0.9em;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .slider-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+        
+        .slider-track {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+        
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .slider-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: all 0.3s;
+        }
+        
+        .dot.active {
+            background: #667eea;
+            width: 24px;
+            border-radius: 4px;
+        }
+        
         .tabs {
             display: flex;
             background: white;
             overflow-x: auto;
             border-bottom: 2px solid #e0e0e0;
+            position: sticky;
+            top: 66px;
+            z-index: 99;
         }
         
         .tab {
@@ -214,6 +283,37 @@
         .refresh-btn:disabled {
             opacity: 0.5;
         }
+        
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .link-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
@@ -222,10 +322,33 @@
         <div class="update-time" id="updateTime">読み込み中...</div>
     </header>
     
+    <div class="gallery-slider" onclick="openGallery()">
+        <div class="gallery-title">📸 フォトギャラリー</div>
+        <div class="slider-container">
+            <div class="slider-track" id="sliderTrack">
+                <div class="slide"><img src="https://via.placeholder.com/600x400/667eea/ffffff?text=Photo+1" alt="Photo 1"></div>
+                <div class="slide"><img src="https://via.placeholder.com/600x400/764ba2/ffffff?text=Photo+2" alt="Photo 2"></div>
+                <div class="slide"><img src="https://via.placeholder.com/600x400/f093fb/ffffff?text=Photo+3" alt="Photo 3"></div>
+                <div class="slide"><img src="https://via.placeholder.com/600x400/4facfe/ffffff?text=Photo+4" alt="Photo 4"></div>
+                <div class="slide"><img src="https://via.placeholder.com/600x400/00f2fe/ffffff?text=Photo+5" alt="Photo 5"></div>
+            </div>
+        </div>
+        <div class="slider-dots" id="sliderDots"></div>
+    </div>
+    
     <div class="tabs" id="tabs"></div>
     
     <div class="content" id="content">
         <div class="loading">データを読み込んでいます...</div>
+    </div>
+    
+    <div class="quick-links">
+        <button class="link-btn" onclick="openPage('schedule.html')">📅 スケジュール</button>
+        <button class="link-btn" onclick="openPage('tournament.html')">🏆 トーナメント</button>
+        <button class="link-btn" onclick="openPage('rules.html')">📋 大会ルール</button>
+        <button class="link-btn" onclick="openPage('teams.html')">👥 チーム一覧</button>
+        <button class="link-btn" onclick="openPage('venue.html')">📍 会場案内</button>
+        <button class="link-btn" onclick="openPage('history.html')">🥇 優勝記録</button>
     </div>
     
     <button class="refresh-btn" id="refreshBtn" onclick="manualRefresh()">🔄</button>
@@ -250,6 +373,50 @@
         let isRefreshing = false;
         let currentCourt = null;
         let gamesData = null;
+        let currentSlide = 0;
+        let sliderInterval = null;
+        
+        // スライダー初期化
+        function initSlider() {
+            const dots = document.getElementById('sliderDots');
+            const slides = document.querySelectorAll('.slide');
+            
+            dots.innerHTML = '';
+            slides.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.className = `dot ${index === 0 ? 'active' : ''}`;
+                dots.appendChild(dot);
+            });
+            
+            // 自動スライド開始（3秒ごと）
+            sliderInterval = setInterval(nextSlide, 3000);
+        }
+        
+        function nextSlide() {
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.dot');
+            
+            currentSlide = (currentSlide + 1) % slides.length;
+            
+            document.getElementById('sliderTrack').style.transform = 
+                `translateX(-${currentSlide * 100}%)`;
+            
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+        
+        function openGallery() {
+            const params = new URLSearchParams();
+            if (API_URL) params.set('api', API_URL);
+            window.location.href = `gallery.html?${params.toString()}`;
+        }
+        
+        function openPage(page) {
+            const params = new URLSearchParams();
+            if (API_URL) params.set('api', API_URL);
+            window.location.href = `${page}?${params.toString()}`;
+        }
         
         async function fetchScores() {
             try {
@@ -410,6 +577,7 @@
         
         fetchScores();
         setInterval(fetchScores, 60000);
+        initSlider();
     </script>
 </body>
 </html>
