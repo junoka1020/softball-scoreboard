@@ -60,6 +60,7 @@
             height: 200px;
             overflow: hidden;
             border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
         .slider-track {
@@ -72,13 +73,29 @@
             min-width: 100%;
             height: 100%;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3em;
         }
         
         .slide img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
+        
+        .slide.placeholder {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .slide.placeholder:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .slide.placeholder:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .slide.placeholder:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .slide.placeholder:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .slide.placeholder:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
         
         .slider-dots {
             display: flex;
@@ -314,6 +331,22 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
+        
+        .gallery-note {
+            text-align: center;
+            color: #999;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .slide-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 0.4em;
+        }
     </style>
 </head>
 <body>
@@ -326,14 +359,15 @@
         <div class="gallery-title">📸 フォトギャラリー</div>
         <div class="slider-container">
             <div class="slider-track" id="sliderTrack">
-                <div class="slide"><img src="https://via.placeholder.com/600x400/667eea/ffffff?text=Photo+1" alt="Photo 1"></div>
-                <div class="slide"><img src="https://via.placeholder.com/600x400/764ba2/ffffff?text=Photo+2" alt="Photo 2"></div>
-                <div class="slide"><img src="https://via.placeholder.com/600x400/f093fb/ffffff?text=Photo+3" alt="Photo 3"></div>
-                <div class="slide"><img src="https://via.placeholder.com/600x400/4facfe/ffffff?text=Photo+4" alt="Photo 4"></div>
-                <div class="slide"><img src="https://via.placeholder.com/600x400/00f2fe/ffffff?text=Photo+5" alt="Photo 5"></div>
+                <div class="slide placeholder">📷</div>
+                <div class="slide placeholder">🏆</div>
+                <div class="slide placeholder">⚾</div>
+                <div class="slide placeholder">🎯</div>
+                <div class="slide placeholder">🥇</div>
             </div>
         </div>
         <div class="slider-dots" id="sliderDots"></div>
+        <div class="gallery-note" id="galleryNote">※ 写真を読み込み中...</div>
     </div>
     
     <div class="tabs" id="tabs"></div>
@@ -375,8 +409,8 @@
         let gamesData = null;
         let currentSlide = 0;
         let sliderInterval = null;
+        let galleryPhotos = [];
         
-        // スライダー初期化
         function initSlider() {
             const dots = document.getElementById('sliderDots');
             const slides = document.querySelectorAll('.slide');
@@ -388,7 +422,6 @@
                 dots.appendChild(dot);
             });
             
-            // 自動スライド開始（3秒ごと）
             sliderInterval = setInterval(nextSlide, 3000);
         }
         
@@ -404,6 +437,71 @@
             dots.forEach((dot, index) => {
                 dot.classList.toggle('active', index === currentSlide);
             });
+        }
+        
+        async function fetchGalleryPhotos() {
+            try {
+                const timestamp = new Date().getTime();
+                const response = await fetch(`${API_URL}?t=${timestamp}`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.photos && data.photos.length > 0) {
+                    galleryPhotos = data.photos;
+                    updateGallerySlider(data.photos);
+                } else {
+                    document.getElementById('galleryNote').textContent = '※ まだ写真が投稿されていません';
+                }
+            } catch (error) {
+                console.error('ギャラリー写真取得エラー:', error);
+                document.getElementById('galleryNote').textContent = '※ 写真の読み込みに失敗しました';
+            }
+        }
+        
+        function updateGallerySlider(photos) {
+            const sliderTrack = document.getElementById('sliderTrack');
+            const photosToShow = photos.slice(0, 5);
+            
+            sliderTrack.innerHTML = '';
+            
+            photosToShow.forEach(photo => {
+                const slide = document.createElement('div');
+                slide.className = 'slide';
+                
+                const img = document.createElement('img');
+                img.src = photo.thumbnail;
+                img.alt = '大会写真';
+                img.onerror = function() {
+                    this.style.display = 'none';
+                    slide.classList.add('placeholder');
+                    slide.innerHTML = '📷';
+                };
+                
+                slide.appendChild(img);
+                sliderTrack.appendChild(slide);
+            });
+            
+            const remainingSlots = 5 - photosToShow.length;
+            for (let i = 0; i < remainingSlots; i++) {
+                const slide = document.createElement('div');
+                slide.className = 'slide placeholder';
+                const icons = ['📷', '🏆', '⚾', '🎯', '🥇'];
+                slide.textContent = icons[photosToShow.length + i];
+                sliderTrack.appendChild(slide);
+            }
+            
+            initSlider();
+            
+            document.getElementById('galleryNote').textContent = 
+                `※ ${photos.length}枚の写真が投稿されています`;
         }
         
         function openGallery() {
@@ -576,7 +674,9 @@
         }
         
         fetchScores();
+        fetchGalleryPhotos();
         setInterval(fetchScores, 60000);
+        setInterval(fetchGalleryPhotos, 60000);
         initSlider();
     </script>
 </body>
