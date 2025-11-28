@@ -94,15 +94,10 @@
             text-align: center;
         }
         
-        .photo-time {
+        .photo-author {
             font-size: 1em;
             color: #666;
-        }
-        
-        .photo-author {
-            font-size: 0.85em;
-            color: #999;
-            margin-top: 5px;
+            font-weight: 500;
         }
         
         .loading {
@@ -155,6 +150,8 @@
             background: rgba(0,0,0,0.9);
             justify-content: center;
             align-items: center;
+            overflow: auto;
+            padding: 20px;
         }
         
         .modal.active {
@@ -162,13 +159,19 @@
         }
         
         .modal-content {
-            max-width: 90%;
-            max-height: 90%;
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         
         .modal-content img {
-            width: 100%;
+            max-width: 100%;
+            max-height: 85vh;
+            width: auto;
             height: auto;
+            object-fit: contain;
             border-radius: 10px;
         }
         
@@ -326,7 +329,6 @@
                     <div class="photo-card" onclick='openModal(${JSON.stringify(photo.fullImage)}, ${JSON.stringify(userName)})'>
                         <img src="${photo.thumbnail}" alt="大会写真" loading="lazy" onerror="this.src='${photo.fullImage}'">
                         <div class="photo-info">
-                            <div class="photo-time">📷 ${photo.timestamp}</div>
                             <div class="photo-author">撮影者: ${userName}</div>
                         </div>
                     </div>
