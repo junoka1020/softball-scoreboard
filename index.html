@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>大会写真ギャラリー</title>
+    <title>ソフトボール大会</title>
     <style>
         * {
             margin: 0;
@@ -15,343 +15,669 @@
             font-family: 'Hiragino Kaku Gothic Pro', 'メイリオ', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
         }
         
         header {
+            background: white;
+            padding: 15px;
             text-align: center;
-            color: white;
-            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
         h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 1.3em;
+            color: #667eea;
         }
         
         .update-time {
-            font-size: 1.1em;
-            opacity: 0.9;
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
         }
         
-        .nav {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .nav a {
-            display: inline-block;
-            padding: 12px 30px;
+        .gallery-slider {
             background: white;
-            color: #667eea;
-            text-decoration: none;
-            border-radius: 25px;
-            font-weight: bold;
-            margin: 5px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
-        }
-        
-        .nav a:hover {
-            transform: translateY(-2px);
-        }
-        
-        .photo-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .photo-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: transform 0.3s;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             cursor: pointer;
         }
         
-        .photo-card:hover {
-            transform: translateY(-5px);
+        .gallery-title {
+            font-size: 0.9em;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
         }
         
-        .photo-card img {
+        .slider-container {
+            position: relative;
             width: 100%;
-            height: 250px;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .slider-track {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+        
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3em;
+        }
+        
+        .slide img {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             display: block;
         }
         
-        .photo-info {
-            padding: 15px;
-            text-align: center;
+        .slide.placeholder {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
-        .photo-time {
+        .slide.placeholder:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .slide.placeholder:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .slide.placeholder:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .slide.placeholder:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .slide.placeholder:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        
+        .slider-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: all 0.3s;
+        }
+        
+        .dot.active {
+            background: #667eea;
+            width: 24px;
+            border-radius: 4px;
+        }
+        
+        .tabs {
+            display: flex;
+            background: white;
+            overflow-x: auto;
+            border-bottom: 2px solid #e0e0e0;
+            position: sticky;
+            top: 66px;
+            z-index: 99;
+        }
+        
+        .tab {
+            flex: 1;
+            min-width: 100px;
+            padding: 15px;
+            text-align: center;
+            background: white;
+            border: none;
             font-size: 1em;
+            font-weight: bold;
             color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .content {
+            padding: 15px;
+        }
+        
+        .court-content {
+            display: none;
+        }
+        
+        .court-content.active {
+            display: block;
+        }
+        
+        .game-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .game-number {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: bold;
+        }
+        
+        .status {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .status.playing {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .status.waiting {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .status.finished {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .matchup {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        
+        .team {
+            flex: 1;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .team.home {
+            text-align: left;
+        }
+        
+        .team.away {
+            text-align: right;
+        }
+        
+        .score-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .scores {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .score-separator {
+            color: #999;
+            font-size: 0.8em;
+        }
+        
+        .inning-info {
+            font-size: 0.85em;
+            color: #666;
+            background: #f5f5f5;
+            padding: 3px 10px;
+            border-radius: 10px;
+        }
+        
+        .no-games {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+            font-size: 1.1em;
         }
         
         .loading {
             text-align: center;
-            padding: 60px;
+            padding: 40px 20px;
             color: white;
-            font-size: 1.5em;
+            font-size: 1.1em;
         }
         
-        .no-photos {
-            text-align: center;
-            padding: 60px;
-            background: white;
-            border-radius: 15px;
-            color: #666;
-            font-size: 1.3em;
-        }
-        
-        .error-box {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-            color: #666;
-        }
-        
-        .error-box h2 {
-            color: #ff6b6b;
-            margin-bottom: 15px;
-        }
-        
-        .error-box code {
-            background: #f5f5f5;
-            padding: 10px;
-            display: block;
-            margin: 10px 0;
-            border-radius: 5px;
-            word-break: break-all;
-        }
-        
-        /* モーダル */
-        .modal {
-            display: none;
+        .refresh-btn {
             position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            justify-content: center;
-            align-items: center;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: white;
+            color: #667eea;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
         }
         
-        .modal.active {
-            display: flex;
+        .refresh-btn:hover:not(:disabled) {
+            transform: scale(1.1);
         }
         
-        .modal-content {
-            max-width: 90%;
-            max-height: 90%;
+        .refresh-btn:disabled {
+            opacity: 0.5;
         }
         
-        .modal-content img {
-            width: 100%;
-            height: auto;
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .link-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 15px;
             border-radius: 10px;
-        }
-        
-        .close-modal {
-            position: absolute;
-            top: 20px;
-            right: 40px;
-            color: white;
-            font-size: 40px;
+            font-size: 0.95em;
             font-weight: bold;
             cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
         
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8em;
-            }
-            
-            .photo-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 10px;
-            }
-            
-            .photo-card img {
-                height: 150px;
-            }
+        .link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .gallery-note {
+            text-align: center;
+            color: #999;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .slide-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 0.4em;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>📸 大会写真ギャラリー 📸</h1>
-            <div class="update-time" id="updateTime">読み込み中...</div>
-        </header>
-        
-        <div class="nav">
-            <a href="#" onclick="goBack(); return false;">← スコアボードに戻る</a>
+    <header>
+        <h1>⚾ ソフトボール大会 ⚾</h1>
+        <div class="update-time" id="updateTime">読み込み中...</div>
+    </header>
+    
+    <div class="gallery-slider" onclick="openGallery()">
+        <div class="gallery-title">📸 フォトギャラリー</div>
+        <div class="slider-container">
+            <div class="slider-track" id="sliderTrack">
+                <div class="slide placeholder">📷</div>
+                <div class="slide placeholder">🏆</div>
+                <div class="slide placeholder">⚾</div>
+                <div class="slide placeholder">🎯</div>
+                <div class="slide placeholder">🥇</div>
+            </div>
         </div>
-        
-        <div class="photo-grid" id="photoGrid">
-            <div class="loading">写真を読み込んでいます...</div>
-        </div>
+        <div class="slider-dots" id="sliderDots"></div>
+        <div class="gallery-note" id="galleryNote">※ 写真を読み込み中...</div>
     </div>
     
-    <!-- モーダル -->
-    <div class="modal" id="modal">
-        <span class="close-modal" onclick="closeModal()">&times;</span>
-        <div class="modal-content">
-            <img id="modalImage" src="" alt="写真">
-        </div>
+    <div class="tabs" id="tabs"></div>
+    
+    <div class="content" id="content">
+        <div class="loading">データを読み込んでいます...</div>
     </div>
+    
+    <div class="quick-links">
+        <button class="link-btn" onclick="openPage('schedule.html')">📅 スケジュール</button>
+        <button class="link-btn" onclick="openPage('tournament.html')">🏆 トーナメント</button>
+        <button class="link-btn" onclick="openPage('rules.html')">📋 大会ルール</button>
+        <button class="link-btn" onclick="openPage('teams.html')">👥 チーム一覧</button>
+        <button class="link-btn" onclick="openPage('venue.html')">📍 会場案内</button>
+        <button class="link-btn" onclick="openPage('history.html')">🥇 優勝記録</button>
+    </div>
+    
+    <button class="refresh-btn" id="refreshBtn" onclick="manualRefresh()">🔄</button>
 
     <script>
-        // URLパラメータからAPIのURLを取得
         const urlParams = new URLSearchParams(window.location.search);
         const API_URL = urlParams.get('api') || localStorage.getItem('STAFF_BOT_API_URL') || '';
         
-        // URLパラメータで指定された場合はlocalStorageに保存
         if (urlParams.get('api')) {
             localStorage.setItem('STAFF_BOT_API_URL', urlParams.get('api'));
         }
         
-        console.log('API URL:', API_URL);
-        
-        // APIのURLが設定されていない場合の警告
         if (!API_URL) {
-            document.getElementById('photoGrid').innerHTML = `
-                <div class="error-box">
+            document.getElementById('content').innerHTML = `
+                <div class="no-games">
                     <h2>⚠️ API URLが設定されていません</h2>
-                    <p>以下の形式でアクセスしてください:</p>
-                    <code>${window.location.origin}${window.location.pathname}?api=YOUR_API_URL</code>
-                    <p style="font-size:0.9em;color:#666;margin-top:10px;">
-                        例: ?api=https://script.google.com/macros/s/AKfycby.../exec
-                    </p>
+                    <p style="margin-top:15px;">URLパラメータでAPIを指定してください</p>
                 </div>
             `;
         }
         
-        // 写真データ取得
-        async function fetchPhotos() {
-            if (!API_URL) return;
+        let isRefreshing = false;
+        let currentCourt = null;
+        let gamesData = null;
+        let currentSlide = 0;
+        let sliderInterval = null;
+        let galleryPhotos = [];
+        
+        function initSlider() {
+            const dots = document.getElementById('sliderDots');
+            const slides = document.querySelectorAll('.slide');
             
+            dots.innerHTML = '';
+            slides.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.className = `dot ${index === 0 ? 'active' : ''}`;
+                dots.appendChild(dot);
+            });
+            
+            sliderInterval = setInterval(nextSlide, 3000);
+        }
+        
+        function nextSlide() {
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.dot');
+            
+            currentSlide = (currentSlide + 1) % slides.length;
+            
+            document.getElementById('sliderTrack').style.transform = 
+                `translateX(-${currentSlide * 100}%)`;
+            
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+        
+        async function fetchGalleryPhotos() {
             try {
                 const timestamp = new Date().getTime();
-                const fetchUrl = `${API_URL}?t=${timestamp}`;
-                console.log('Fetching from:', fetchUrl);
-                
-                const response = await fetch(fetchUrl, {
+                const response = await fetch(`${API_URL}?t=${timestamp}`, {
                     method: 'GET',
                     mode: 'cors',
                     cache: 'no-cache'
                 });
-                
-                console.log('Response status:', response.status);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 const data = await response.json();
-                console.log('Data received:', data);
                 
-                displayPhotos(data);
-                
-                const photoCount = data.photos ? data.photos.length : 0;
-                document.getElementById('updateTime').textContent = 
-                    `最終更新: ${data.lastUpdate || '不明'} | 投稿枚数: ${photoCount}枚`;
+                if (data.photos && data.photos.length > 0) {
+                    galleryPhotos = data.photos;
+                    updateGallerySlider(data.photos);
+                } else {
+                    document.getElementById('galleryNote').textContent = '※ まだ写真が投稿されていません';
+                }
             } catch (error) {
-                console.error('データ取得エラー:', error);
-                document.getElementById('photoGrid').innerHTML = `
-                    <div class="error-box">
-                        <h2>⚠️ 写真の読み込みに失敗しました</h2>
-                        <p>エラー詳細: ${error.message}</p>
-                        <p style="margin-top:10px;">API URL: <code>${API_URL}</code></p>
-                        <p style="font-size:0.9em;color:#666;margin-top:10px;">
-                            ・API URLが正しいか確認してください<br>
-                            ・ネットワーク接続を確認してください<br>
-                            ・開発者ツールのコンソールでエラーを確認してください
-                        </p>
-                    </div>
-                `;
+                console.error('ギャラリー写真取得エラー:', error);
+                document.getElementById('galleryNote').textContent = '※ 写真の読み込みに失敗しました';
             }
         }
         
-        // 写真表示
-        function displayPhotos(data) {
-            const grid = document.getElementById('photoGrid');
+        function updateGallerySlider(photos) {
+            const sliderTrack = document.getElementById('sliderTrack');
+            const photosToShow = photos.slice(0, 5);
             
-            if (!data.photos || data.photos.length === 0) {
-                grid.innerHTML = `
-                    <div class="no-photos">
-                        まだ写真が投稿されていません<br>
-                        <span style="font-size:0.8em;margin-top:10px;display:block;">
-                            LINE Botに写真を送信すると、ここに表示されます
-                        </span>
-                    </div>
-                `;
+            sliderTrack.innerHTML = '';
+            
+            photosToShow.forEach(photo => {
+                const slide = document.createElement('div');
+                slide.className = 'slide';
+                
+                const img = document.createElement('img');
+                img.src = photo.thumbnail;
+                img.alt = '大会写真';
+                img.onerror = function() {
+                    this.style.display = 'none';
+                    slide.classList.add('placeholder');
+                    slide.innerHTML = '📷';
+                };
+                
+                slide.appendChild(img);
+                sliderTrack.appendChild(slide);
+            });
+            
+            const remainingSlots = 5 - photosToShow.length;
+            for (let i = 0; i < remainingSlots; i++) {
+                const slide = document.createElement('div');
+                slide.className = 'slide placeholder';
+                const icons = ['📷', '🏆', '⚾', '🎯', '🥇'];
+                slide.textContent = icons[photosToShow.length + i];
+                sliderTrack.appendChild(slide);
+            }
+            
+            initSlider();
+            
+            document.getElementById('galleryNote').textContent = 
+                `※ ${photos.length}枚の写真が投稿されています`;
+        }
+        
+        function openGallery() {
+            const params = new URLSearchParams();
+            if (API_URL) params.set('api', API_URL);
+            window.location.href = `gallery.html?${params.toString()}`;
+        }
+        
+        function openPage(page) {
+            const params = new URLSearchParams();
+            if (API_URL) params.set('api', API_URL);
+            window.location.href = `${page}?${params.toString()}`;
+        }
+        
+        async function fetchScores() {
+            try {
+                const timestamp = new Date().getTime();
+                const response = await fetch(`${API_URL}?t=${timestamp}`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                gamesData = data;
+                displayGames(data);
+                
+                document.getElementById('updateTime').textContent = 
+                    `最終更新: ${data.lastUpdate}`;
+            } catch (error) {
+                console.error('データ取得エラー:', error);
+                document.getElementById('content').innerHTML = 
+                    `<div class="no-games">データの読み込みに失敗しました</div>`;
+            }
+        }
+        
+        async function manualRefresh() {
+            if (isRefreshing) return;
+            
+            isRefreshing = true;
+            const btn = document.getElementById('refreshBtn');
+            btn.disabled = true;
+            
+            await fetchScores();
+            
+            setTimeout(() => {
+                isRefreshing = false;
+                btn.disabled = false;
+            }, 2000);
+        }
+        
+        function displayGames(data) {
+            if (!data.games || data.games.length === 0) {
+                document.getElementById('content').innerHTML = 
+                    '<div class="no-games">まだ試合データがありません</div>';
                 return;
             }
             
-            let html = '';
-            data.photos.forEach(photo => {
-                html += `
-                    <div class="photo-card" onclick="openModal('${photo.fullImage}')">
-                        <img src="${photo.thumbnail}" alt="大会写真" loading="lazy" onerror="this.src='${photo.fullImage}'">
-                        <div class="photo-info">
-                            <div class="photo-time">📷 ${photo.timestamp}</div>
-                        </div>
-                    </div>
-                `;
+            const courtGroups = {};
+            data.games.forEach(game => {
+                if (!courtGroups[game.court]) {
+                    courtGroups[game.court] = {};
+                }
+                if (!courtGroups[game.court][game.gameNum]) {
+                    courtGroups[game.court][game.gameNum] = [];
+                }
+                courtGroups[game.court][game.gameNum].push(game);
             });
             
-            grid.innerHTML = html;
+            const courts = Object.keys(courtGroups).sort();
+            
+            if (!currentCourt || !courts.includes(currentCourt)) {
+                currentCourt = courts[0];
+            }
+            
+            let tabsHtml = '';
+            courts.forEach(court => {
+                const activeClass = court === currentCourt ? 'active' : '';
+                tabsHtml += `<button class="tab ${activeClass}" onclick="switchCourt('${court}')">${court}コート</button>`;
+            });
+            document.getElementById('tabs').innerHTML = tabsHtml;
+            
+            let contentHtml = '';
+            courts.forEach(court => {
+                const activeClass = court === currentCourt ? 'active' : '';
+                contentHtml += `<div class="court-content ${activeClass}" id="court-${court}">`;
+                
+                const games = courtGroups[court];
+                const gameNums = Object.keys(games).sort((a, b) => a - b);
+                
+                gameNums.forEach(gameNum => {
+                    const teams = games[gameNum];
+                    const status = teams[0].status || '待機';
+                    
+                    let statusClass = 'waiting';
+                    if (status === '試合中') statusClass = 'playing';
+                    if (status === '終了') statusClass = 'finished';
+                    
+                    const homeTeam = teams[0];
+                    const awayTeam = teams[1];
+                    
+                    const currentInning = getCurrentInning(homeTeam, awayTeam);
+                    
+                    contentHtml += `
+                        <div class="game-card" onclick="openScoreboard('${court}', ${gameNum})">
+                            <div class="game-header">
+                                <span class="game-number">第${gameNum}試合</span>
+                                <span class="status ${statusClass}">${status}</span>
+                            </div>
+                            <div class="matchup">
+                                <div class="team home">${homeTeam.team}</div>
+                                <div class="score-display">
+                                    <div class="scores">
+                                        <span>${homeTeam.total || 0}</span>
+                                        <span class="score-separator">-</span>
+                                        <span>${awayTeam.total || 0}</span>
+                                    </div>
+                                    ${currentInning ? `<div class="inning-info">${currentInning}</div>` : ''}
+                                </div>
+                                <div class="team away">${awayTeam.team}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                contentHtml += '</div>';
+            });
+            
+            document.getElementById('content').innerHTML = contentHtml;
         }
         
-        // モーダル表示
-        function openModal(imageUrl) {
-            document.getElementById('modalImage').src = imageUrl;
-            document.getElementById('modal').classList.add('active');
+        function getCurrentInning(homeTeam, awayTeam) {
+            if (!homeTeam.innings || homeTeam.innings.length === 0) {
+                return null;
+            }
+            
+            for (let i = 0; i < homeTeam.innings.length; i++) {
+                if (awayTeam.innings[i] !== null && awayTeam.innings[i] !== undefined && awayTeam.innings[i] !== '' &&
+                    (homeTeam.innings[i] === null || homeTeam.innings[i] === undefined || homeTeam.innings[i] === '')) {
+                    return `${i + 1}回表`;
+                }
+                if ((homeTeam.innings[i] === null || homeTeam.innings[i] === undefined || homeTeam.innings[i] === '') &&
+                    (awayTeam.innings[i] === null || awayTeam.innings[i] === undefined || awayTeam.innings[i] === '')) {
+                    if (i > 0) {
+                        return `${i}回終了`;
+                    }
+                    return null;
+                }
+            }
+            
+            return `${homeTeam.innings.length}回終了`;
         }
         
-        // モーダル閉じる
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
+        function switchCourt(court) {
+            currentCourt = court;
+            displayGames(gamesData);
         }
         
-        // 戻るボタン
-        function goBack() {
+        function openScoreboard(court, gameNum) {
             const params = new URLSearchParams();
             if (API_URL) params.set('api', API_URL);
-            window.location.href = `index.html?${params.toString()}`;
+            params.set('court', court);
+            params.set('game', gameNum);
+            
+            window.location.href = `scoreboard.html?${params.toString()}`;
         }
         
-        // Escキーでモーダルを閉じる
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
-        
-        // モーダル背景クリックで閉じる
-        document.getElementById('modal').addEventListener('click', (e) => {
-            if (e.target.id === 'modal') closeModal();
-        });
-        
-        // 初回読み込み
-        fetchPhotos();
-        
-        // 30秒ごとに自動更新
-        setInterval(fetchPhotos, 30000);
+        fetchScores();
+        fetchGalleryPhotos();
+        setInterval(fetchScores, 60000);
+        setInterval(fetchGalleryPhotos, 60000);
+        initSlider();
     </script>
 </body>
 </html>
