@@ -437,7 +437,11 @@
                 dots.appendChild(dot);
             });
             
-            sliderInterval = setInterval(nextSlide, 3000);
+            // スライド間隔を3秒から5秒に変更
+            if (sliderInterval) {
+                clearInterval(sliderInterval);
+            }
+            sliderInterval = setInterval(nextSlide, 5000);
         }
         
         function nextSlide() {
