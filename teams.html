@@ -58,6 +58,45 @@
             margin: 0 auto;
         }
         
+        .jump-links {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .jump-links-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .jump-links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .jump-link {
+            display: block;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .jump-link:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(5px);
+        }
+        
         .loading {
             text-align: center;
             padding: 40px;
@@ -266,11 +305,30 @@
             
             let html = '';
             
+            // ジャンプリンク作成
+            html += `
+                <div class="jump-links">
+                    <div class="jump-links-title">📋 チーム一覧</div>
+                    <div class="jump-links-grid">
+            `;
+            
+            data.teams.forEach((team, index) => {
+                const teamId = `team-${index}`;
+                html += `<a href="#${teamId}" class="jump-link">${team.name}</a>`;
+            });
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
+            // チームカード作成
             data.teams.forEach((team, index) => {
                 const icon = teamIcons[index % teamIcons.length];
+                const teamId = `team-${index}`;
                 
                 html += `
-                    <div class="team-card">
+                    <div class="team-card" id="${teamId}">
                         <div class="team-header">
                             <div class="team-icon">${icon}</div>
                             <div class="team-info">
@@ -291,7 +349,7 @@
                         <div class="player">
                             ${photoHtml}
                             <div class="player-info">
-                                <div class="player-number">#${player.number || '-'}</div>
+                                <div class="player-number">#${player.number}</div>
                                 <div class="player-name">${player.name}</div>
                                 <div class="player-position">${player.position}</div>
                                 ${player.note ? `<div class="player-note">${player.note}</div>` : ''}
