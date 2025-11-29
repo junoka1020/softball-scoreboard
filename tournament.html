@@ -47,9 +47,19 @@
             background: #5568d3;
         }
         
+        .header-info {
+            flex: 1;
+        }
+        
         h1 {
             font-size: 1.2em;
             color: #667eea;
+        }
+        
+        .update-time {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 3px;
         }
         
         .container {
@@ -61,7 +71,7 @@
             background: white;
             border-radius: 15px;
             padding: 20px;
-            min-width: 800px;
+            min-width: 900px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         
@@ -71,6 +81,27 @@
             color: #667eea;
             text-align: center;
             margin-bottom: 30px;
+        }
+        
+        .bracket-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        
+        .bracket-section {
+            position: relative;
+        }
+        
+        .section-label {
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 8px;
         }
         
         .bracket {
@@ -83,7 +114,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-around;
-            min-width: 150px;
+            min-width: 180px;
         }
         
         .round-title {
@@ -91,7 +122,7 @@
             font-weight: bold;
             color: #667eea;
             margin-bottom: 20px;
-            font-size: 0.9em;
+            font-size: 0.95em;
         }
         
         .match {
@@ -100,14 +131,32 @@
             border-radius: 8px;
             overflow: hidden;
             border: 2px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .match:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        .match.playing {
+            border-color: #ff6b6b;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(255, 107, 107, 0); }
         }
         
         .team {
-            padding: 10px 15px;
+            padding: 12px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #e0e0e0;
+            min-height: 48px;
         }
         
         .team:last-child {
@@ -122,41 +171,136 @@
         .team-name {
             font-size: 1em;
             color: #333;
+            flex: 1;
+        }
+        
+        .team-name.tbd {
+            color: #999;
+            font-style: italic;
         }
         
         .score {
             font-weight: bold;
             color: #667eea;
-            font-size: 1.2em;
-            min-width: 30px;
+            font-size: 1.3em;
+            min-width: 35px;
             text-align: center;
         }
         
-        .tbd {
-            color: #999;
-            font-style: italic;
+        .score.tbd {
+            color: #ccc;
+            font-size: 1em;
         }
         
-        .champion {
+        .match-status {
+            text-align: center;
+            padding: 5px;
+            font-size: 0.75em;
+            background: #f0f0f0;
+            color: #666;
+        }
+        
+        .match-status.playing {
+            background: #ff6b6b;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .match-status.finished {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .champion-section {
             text-align: center;
             margin-top: 30px;
-            padding: 20px;
+            padding: 30px 20px;
             background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
         }
         
+        .champion-trophy {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+        
         .champion-title {
-            font-size: 1.2em;
+            font-size: 1.3em;
             font-weight: bold;
             color: #856404;
             margin-bottom: 10px;
         }
         
         .champion-name {
-            font-size: 2em;
+            font-size: 2.5em;
             font-weight: bold;
             color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .champion-name.tbd {
+            font-size: 1.8em;
+            color: #856404;
+            font-style: italic;
+        }
+        
+        .champion-score {
+            font-size: 1.1em;
+            color: #856404;
+            margin-top: 10px;
+        }
+        
+        .third-place-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .third-place-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .third-place-name {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.2em;
+        }
+        
+        .refresh-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: white;
+            color: #667eea;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+        
+        .refresh-btn:hover:not(:disabled) {
+            transform: scale(1.1);
+        }
+        
+        .refresh-btn:disabled {
+            opacity: 0.5;
         }
         
         @media (max-width: 768px) {
@@ -164,20 +308,33 @@
                 padding: 10px;
             }
             
+            .tournament {
+                min-width: 750px;
+                padding: 15px;
+            }
+            
             .bracket {
                 gap: 20px;
             }
             
             .round {
-                min-width: 120px;
+                min-width: 140px;
             }
             
             .team {
-                padding: 8px 10px;
+                padding: 10px;
             }
             
             .team-name {
                 font-size: 0.9em;
+            }
+            
+            .champion-trophy {
+                font-size: 3em;
+            }
+            
+            .champion-name {
+                font-size: 2em;
             }
         }
     </style>
@@ -186,117 +343,358 @@
     <header>
         <div class="header-content">
             <button class="back-btn" onclick="goBack()">← 戻る</button>
-            <h1>🏆 トーナメント表</h1>
+            <div class="header-info">
+                <h1>🏆 トーナメント表</h1>
+                <div class="update-time" id="updateTime">読み込み中...</div>
+            </div>
         </div>
     </header>
     
-    <div class="container">
-        <div class="tournament">
-            <div class="tournament-title">決勝トーナメント</div>
-            
-            <div class="bracket">
-                <!-- 準々決勝 -->
-                <div class="round">
-                    <div class="round-title">準々決勝</div>
-                    <div class="match">
-                        <div class="team winner">
-                            <span class="team-name">Aブロック1位</span>
-                            <span class="score">5</span>
-                        </div>
-                        <div class="team">
-                            <span class="team-name">Bブロック2位</span>
-                            <span class="score">3</span>
-                        </div>
-                    </div>
-                    <div class="match">
-                        <div class="team">
-                            <span class="team-name">Bブロック1位</span>
-                            <span class="score">2</span>
-                        </div>
-                        <div class="team winner">
-                            <span class="team-name">Aブロック2位</span>
-                            <span class="score">4</span>
-                        </div>
-                    </div>
-                    <div class="match">
-                        <div class="team winner">
-                            <span class="team-name">Cブロック1位</span>
-                            <span class="score">6</span>
-                        </div>
-                        <div class="team">
-                            <span class="team-name">Dブロック2位</span>
-                            <span class="score">1</span>
-                        </div>
-                    </div>
-                    <div class="match">
-                        <div class="team">
-                            <span class="team-name">Dブロック1位</span>
-                            <span class="score tbd">-</span>
-                        </div>
-                        <div class="team">
-                            <span class="team-name">Cブロック2位</span>
-                            <span class="score tbd">-</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 準決勝 -->
-                <div class="round">
-                    <div class="round-title">準決勝</div>
-                    <div class="match">
-                        <div class="team winner">
-                            <span class="team-name">Aブロック1位</span>
-                            <span class="score">3</span>
-                        </div>
-                        <div class="team">
-                            <span class="team-name">Aブロック2位</span>
-                            <span class="score">2</span>
-                        </div>
-                    </div>
-                    <div class="match">
-                        <div class="team">
-                            <span class="team-name">Cブロック1位</span>
-                            <span class="score tbd">-</span>
-                        </div>
-                        <div class="team">
-                            <span class="team-name tbd">未定</span>
-                            <span class="score tbd">-</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 決勝 -->
-                <div class="round">
-                    <div class="round-title">決勝</div>
-                    <div class="match">
-                        <div class="team">
-                            <span class="team-name">Aブロック1位</span>
-                            <span class="score tbd">-</span>
-                        </div>
-                        <div class="team">
-                            <span class="team-name tbd">未定</span>
-                            <span class="score tbd">-</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="champion">
-                <div class="champion-title">🏆 優勝</div>
-                <div class="champion-name tbd">まもなく決定！</div>
-            </div>
-        </div>
+    <div class="container" id="content">
+        <div class="loading">データを読み込んでいます...</div>
     </div>
+    
+    <button class="refresh-btn" id="refreshBtn" onclick="manualRefresh()">🔄</button>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const API_URL = urlParams.get('api') || localStorage.getItem('STAFF_BOT_API_URL') || '';
+        
+        if (urlParams.get('api')) {
+            localStorage.setItem('STAFF_BOT_API_URL', urlParams.get('api'));
+        }
+        
+        let isRefreshing = false;
+        
+        // トーナメント構造定義
+        const TOURNAMENT_STRUCTURE = {
+            main: {
+                round1: [1, 2, 3, 4], // 1回戦の試合番号
+                round2: [5, 6],        // 2回戦（準決勝）の試合番号
+                final: [7]             // 決勝戦の試合番号
+            },
+            thirdPlace: [8]  // 3位決定戦の試合番号
+        };
+        
+        async function fetchScores() {
+            try {
+                const timestamp = new Date().getTime();
+                const response = await fetch(`${API_URL}?t=${timestamp}`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                displayTournament(data);
+                
+                document.getElementById('updateTime').textContent = 
+                    `最終更新: ${data.lastUpdate}`;
+            } catch (error) {
+                console.error('データ取得エラー:', error);
+                document.getElementById('content').innerHTML = 
+                    `<div class="loading">データの読み込みに失敗しました</div>`;
+            }
+        }
+        
+        async function manualRefresh() {
+            if (isRefreshing) return;
+            
+            isRefreshing = true;
+            const btn = document.getElementById('refreshBtn');
+            btn.disabled = true;
+            
+            await fetchScores();
+            
+            setTimeout(() => {
+                isRefreshing = false;
+                btn.disabled = false;
+            }, 2000);
+        }
+        
+        function getMatchData(games, gameNum) {
+            const matchGames = games.filter(g => g.gameNum === gameNum);
+            if (matchGames.length < 2) return null;
+            
+            const team1 = matchGames[0];
+            const team2 = matchGames[1];
+            
+            return {
+                gameNum: gameNum,
+                team1: {
+                    name: team1.team,
+                    score: team1.total || 0
+                },
+                team2: {
+                    name: team2.team,
+                    score: team2.total || 0
+                },
+                status: team1.status || '待機',
+                court: team1.court,
+                winner: null
+            };
+        }
+        
+        function determineWinner(match) {
+            if (!match || match.status !== '終了') return null;
+            if (match.team1.score > match.team2.score) return match.team1.name;
+            if (match.team2.score > match.team1.score) return match.team2.name;
+            return null;
+        }
+        
+        function getNextRoundTeam(matches, prevGameNums, position) {
+            if (!prevGameNums || prevGameNums.length === 0) return '未定';
+            
+            const prevMatch = matches[prevGameNums[position]];
+            if (!prevMatch) return '未定';
+            
+            const winner = determineWinner(prevMatch);
+            return winner || '未定';
+        }
+        
+        function getLoser(match) {
+            if (!match || match.status !== '終了') return null;
+            if (match.team1.score < match.team2.score) return match.team1.name;
+            if (match.team2.score < match.team1.score) return match.team2.name;
+            return null;
+        }
+        
+        function displayTournament(data) {
+            if (!data.games || data.games.length === 0) {
+                document.getElementById('content').innerHTML = 
+                    '<div class="loading">試合データがありません</div>';
+                return;
+            }
+            
+            const matches = {};
+            
+            // 全試合データを取得
+            for (let gameNum of [...TOURNAMENT_STRUCTURE.main.round1, 
+                                   ...TOURNAMENT_STRUCTURE.main.round2, 
+                                   ...TOURNAMENT_STRUCTURE.main.final,
+                                   ...TOURNAMENT_STRUCTURE.thirdPlace]) {
+                matches[gameNum] = getMatchData(data.games, gameNum);
+            }
+            
+            let html = `
+                <div class="tournament">
+                    <div class="tournament-title">決勝トーナメント</div>
+                    
+                    <!-- メイントーナメント -->
+                    <div class="bracket-section">
+                        <div class="section-label">🏆 優勝決定トーナメント</div>
+                        <div class="bracket">
+                            <!-- 1回戦 -->
+                            <div class="round">
+                                <div class="round-title">1回戦</div>
+            `;
+            
+            // 1回戦の試合を表示
+            TOURNAMENT_STRUCTURE.main.round1.forEach(gameNum => {
+                const match = matches[gameNum];
+                html += renderMatch(match, gameNum);
+            });
+            
+            html += `
+                            </div>
+                            
+                            <!-- 2回戦（準決勝） -->
+                            <div class="round">
+                                <div class="round-title">2回戦（準決勝）</div>
+            `;
+            
+            // 2回戦の試合を表示
+            TOURNAMENT_STRUCTURE.main.round2.forEach((gameNum, idx) => {
+                const match = matches[gameNum];
+                const prevGames = [
+                    TOURNAMENT_STRUCTURE.main.round1[idx * 2],
+                    TOURNAMENT_STRUCTURE.main.round1[idx * 2 + 1]
+                ];
+                html += renderMatch(match, gameNum, matches, prevGames);
+            });
+            
+            html += `
+                            </div>
+                            
+                            <!-- 決勝 -->
+                            <div class="round">
+                                <div class="round-title">決勝</div>
+            `;
+            
+            // 決勝戦を表示
+            const finalMatch = matches[TOURNAMENT_STRUCTURE.main.final[0]];
+            html += renderMatch(finalMatch, TOURNAMENT_STRUCTURE.main.final[0], matches, TOURNAMENT_STRUCTURE.main.round2);
+            
+            html += `
+                            </div>
+                        </div>
+                    </div>
+            `;
+            
+            // 3位決定戦
+            html += `
+                    <div class="bracket-section" style="margin-top: 40px;">
+                        <div class="section-label">🥉 3位決定戦</div>
+                        <div class="bracket" style="justify-content: center;">
+                            <div class="round" style="min-width: 250px;">
+            `;
+            
+            const thirdPlaceMatch = matches[TOURNAMENT_STRUCTURE.thirdPlace[0]];
+            const losers = TOURNAMENT_STRUCTURE.main.round2.map(gNum => {
+                const m = matches[gNum];
+                return m && m.status === '終了' ? getLoser(m) : null;
+            }).filter(l => l);
+            
+            html += renderThirdPlaceMatch(thirdPlaceMatch, TOURNAMENT_STRUCTURE.thirdPlace[0], losers);
+            
+            html += `
+                            </div>
+                        </div>
+                    </div>
+            `;
+            
+            // 優勝・3位表示
+            const champion = finalMatch && finalMatch.status === '終了' ? determineWinner(finalMatch) : null;
+            const thirdPlace = thirdPlaceMatch && thirdPlaceMatch.status === '終了' ? determineWinner(thirdPlaceMatch) : null;
+            
+            html += `
+                    <div class="champion-section">
+                        <div class="champion-trophy">🏆</div>
+                        <div class="champion-title">優勝</div>
+                        <div class="champion-name ${champion ? '' : 'tbd'}">
+                            ${champion || 'まもなく決定！'}
+                        </div>
+            `;
+            
+            if (champion && finalMatch) {
+                html += `
+                        <div class="champion-score">
+                            決勝スコア: ${finalMatch.team1.score} - ${finalMatch.team2.score}
+                        </div>
+                `;
+            }
+            
+            if (thirdPlace) {
+                html += `
+                        <div class="third-place-section">
+                            <div class="third-place-title">🥉 第3位</div>
+                            <div class="third-place-name">${thirdPlace}</div>
+                        </div>
+                `;
+            }
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('content').innerHTML = html;
+        }
+        
+        function renderMatch(match, gameNum, allMatches = {}, prevGameNums = null) {
+            if (!match) {
+                // データがない場合
+                const team1Name = prevGameNums ? getNextRoundTeam(allMatches, prevGameNums, 0) : '未定';
+                const team2Name = prevGameNums ? getNextRoundTeam(allMatches, prevGameNums, 1) : '未定';
+                
+                return `
+                    <div class="match">
+                        <div class="team">
+                            <span class="team-name tbd">${team1Name}</span>
+                            <span class="score tbd">-</span>
+                        </div>
+                        <div class="team">
+                            <span class="team-name tbd">${team2Name}</span>
+                            <span class="score tbd">-</span>
+                        </div>
+                        <div class="match-status">第${gameNum}試合</div>
+                    </div>
+                `;
+            }
+            
+            const winner = determineWinner(match);
+            const statusClass = match.status === '試合中' ? 'playing' : 
+                               match.status === '終了' ? 'finished' : '';
+            
+            return `
+                <div class="match ${statusClass}" onclick="openScoreboard('${match.court}', ${gameNum})">
+                    <div class="team ${winner === match.team1.name ? 'winner' : ''}">
+                        <span class="team-name">${match.team1.name}</span>
+                        <span class="score">${match.team1.score}</span>
+                    </div>
+                    <div class="team ${winner === match.team2.name ? 'winner' : ''}">
+                        <span class="team-name">${match.team2.name}</span>
+                        <span class="score">${match.team2.score}</span>
+                    </div>
+                    <div class="match-status ${statusClass}">
+                        ${match.court}コート 第${gameNum}試合 - ${match.status}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderThirdPlaceMatch(match, gameNum, possibleTeams) {
+            if (!match) {
+                const team1 = possibleTeams[0] || '準決勝敗者1';
+                const team2 = possibleTeams[1] || '準決勝敗者2';
+                
+                return `
+                    <div class="match">
+                        <div class="team">
+                            <span class="team-name tbd">${team1}</span>
+                            <span class="score tbd">-</span>
+                        </div>
+                        <div class="team">
+                            <span class="team-name tbd">${team2}</span>
+                            <span class="score tbd">-</span>
+                        </div>
+                        <div class="match-status">第${gameNum}試合 - 3位決定戦</div>
+                    </div>
+                `;
+            }
+            
+            const winner = determineWinner(match);
+            const statusClass = match.status === '試合中' ? 'playing' : 
+                               match.status === '終了' ? 'finished' : '';
+            
+            return `
+                <div class="match ${statusClass}" onclick="openScoreboard('${match.court}', ${gameNum})">
+                    <div class="team ${winner === match.team1.name ? 'winner' : ''}">
+                        <span class="team-name">${match.team1.name}</span>
+                        <span class="score">${match.team1.score}</span>
+                    </div>
+                    <div class="team ${winner === match.team2.name ? 'winner' : ''}">
+                        <span class="team-name">${match.team2.name}</span>
+                        <span class="score">${match.team2.score}</span>
+                    </div>
+                    <div class="match-status ${statusClass}">
+                        ${match.court}コート 第${gameNum}試合 - ${match.status}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function openScoreboard(court, gameNum) {
+            const params = new URLSearchParams();
+            if (API_URL) params.set('api', API_URL);
+            params.set('court', court);
+            params.set('game', gameNum);
+            
+            window.location.href = `scoreboard.html?${params.toString()}`;
+        }
         
         function goBack() {
             const params = new URLSearchParams();
             if (API_URL) params.set('api', API_URL);
             window.location.href = `index.html?${params.toString()}`;
         }
+        
+        fetchScores();
+        setInterval(fetchScores, 60000);
     </script>
 </body>
 </html>
