@@ -479,8 +479,14 @@
                 if (scheduleResponse.ok) {
                     const scheduleJson = await scheduleResponse.json();
                     if (scheduleJson.schedule) {
+                        // 試合番号をキーにしたマップに変換
                         scheduleData = scheduleJson.schedule.reduce((acc, s) => {
-                            acc[s.gameNum] = s;
+                            acc[s.gameNum] = {
+                                court: s.court,
+                                time: s.time,
+                                team1: s.team1,
+                                team2: s.team2
+                            };
                             return acc;
                         }, {});
                     }
