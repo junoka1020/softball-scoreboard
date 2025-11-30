@@ -438,8 +438,6 @@
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const API_URL = urlParams.get('api') || localStorage.getItem('STAFF_BOT_API_URL') || '';
-        // 【この行を追加】
-        window.API_URL = API_URL;
         
         if (urlParams.get('api')) {
             localStorage.setItem('STAFF_BOT_API_URL', urlParams.get('api'));
@@ -839,3 +837,21 @@
                 </div>
             `;
         }
+        
+    async function manualRefresh() {
+    // 処理中にボタンを無効化し、重複実行を防ぐ
+    if (isRefreshing) return;
+    
+    isRefreshing = true;
+    const btn = document.getElementById('refreshBtn');
+    btn.disabled = true;
+    
+    // データ取得関数を呼び出す
+    await fetchScores(); 
+    
+    // 2秒後に再度有効化する
+    setTimeout(() => {
+        isRefreshing = false;
+        btn.disabled = false;
+    }, 2000);
+}
