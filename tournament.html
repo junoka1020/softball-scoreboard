@@ -11,6 +11,30 @@
             box-sizing: border-box;
         }
         
+        function openScoreboard(court, gameNum) {
+            if (!court) return;
+            const params = new URLSearchParams();
+            if (API_URL) params.set('api', API_URL);
+            params.set('court', court);
+            params.set('game', gameNum);
+            
+            window.location.href = `scoreboard.html?${params.toString()}`;
+        }
+        
+        function goBack() {
+            const params = new URLSearchParams();
+            if (API_URL) params.set('api', API_URL);
+            window.location.href = `index.html?${params.toString()}`;
+        }
+        
+        // 初回読み込み
+        fetchScores();
+        // 60秒ごとに自動更新
+        setInterval(fetchScores, 60000);
+    </script>
+</body>
+</html>
+        
         body {
             font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -443,6 +467,8 @@
             localStorage.setItem('STAFF_BOT_API_URL', urlParams.get('api'));
         }
         
+        console.log('API URL:', API_URL); // デバッグ用
+        
         let isRefreshing = false;
         
         // トーナメント構造定義（7チーム）
@@ -454,8 +480,23 @@
         };
         
         async function fetchScores() {
+            if (!API_URL) {
+                console.error('API URLが設定されていません');
+                document.getElementById('content').innerHTML = `
+                    <div class="loading">
+                        ⚠️ API URLが設定されていません<br>
+                        <small style="margin-top:10px;display:block;">
+                            URLパラメータで ?api=YOUR_API_URL を指定してください
+                        </small>
+                    </div>
+                `;
+                return;
+            }
+            
             try {
                 const timestamp = new Date().getTime();
+                console.log('Fetching from:', `${API_URL}?t=${timestamp}`); // デバッグ用
+                
                 const response = await fetch(`${API_URL}?t=${timestamp}`, {
                     method: 'GET',
                     mode: 'cors',
@@ -467,6 +508,7 @@
                 }
                 
                 const data = await response.json();
+                console.log('Score data received:', data); // デバッグ用
                 
                 // 試合予定を取得
                 const scheduleResponse = await fetch(`${API_URL}?type=schedule&t=${timestamp}`, {
@@ -478,6 +520,8 @@
                 let scheduleData = {};
                 if (scheduleResponse.ok) {
                     const scheduleJson = await scheduleResponse.json();
+                    console.log('Schedule data received:', scheduleJson); // デバッグ用
+                    
                     if (scheduleJson.schedule) {
                         // 試合番号をキーにしたマップに変換
                         scheduleData = scheduleJson.schedule.reduce((acc, s) => {
@@ -499,8 +543,24 @@
             } catch (error) {
                 console.error('データ取得エラー:', error);
                 document.getElementById('content').innerHTML = 
-                    `<div class="loading">データの読み込みに失敗しました</div>`;
+                    `<div class="loading">データの読み込みに失敗しました<br>
+                    <small style="margin-top:10px;display:block;">${error.message}</small></div>`;
             }
+        }
+        
+        async function manualRefresh() {
+            if (isRefreshing) return;
+            
+            isRefreshing = true;
+            const btn = document.getElementById('refreshBtn');
+            btn.disabled = true;
+            
+            await fetchScores();
+            
+            setTimeout(() => {
+                isRefreshing = false;
+                btn.disabled = false;
+            }, 2000);
         }
         
         async function manualRefresh() {
@@ -837,21 +897,3 @@
                 </div>
             `;
         }
-        
-    async function manualRefresh() {
-    // 処理中にボタンを無効化し、重複実行を防ぐ
-    if (isRefreshing) return;
-    
-    isRefreshing = true;
-    const btn = document.getElementById('refreshBtn');
-    btn.disabled = true;
-    
-    // データ取得関数を呼び出す
-    await fetchScores(); 
-    
-    // 2秒後に再度有効化する
-    setTimeout(() => {
-        isRefreshing = false;
-        btn.disabled = false;
-    }, 2000);
-}
