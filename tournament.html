@@ -447,10 +447,10 @@
         
         // トーナメント構造定義（7チーム）
         const TOURNAMENT_STRUCTURE = {
-            round1: [1, 2, 3],     // 1回戦（3試合 + 1シード）
-            semiFinals: [4, 5],    // 準決勝（2試合）
-            final: [6],            // 決勝
-            thirdPlace: [7]        // 3位決定戦
+            round1: [1, 2, 3],     // 1回戦（3試合 + 1シード）
+            semiFinals: [4, 5],    // 準決勝（2試合）
+            final: [6],            // 決勝
+            thirdPlace: [7]        // 3位決定戦
         };
         
         async function fetchScores() {
@@ -494,11 +494,11 @@
                 
                 displayTournament(data, scheduleData);
                 
-                document.getElementById('updateTime').textContent = 
+                document.getElementById('updateTime').textContent = 
                     `最終更新: ${data.lastUpdate}`;
             } catch (error) {
                 console.error('データ取得エラー:', error);
-                document.getElementById('content').innerHTML = 
+                document.getElementById('content').innerHTML = 
                     `<div class="loading">データの読み込みに失敗しました</div>`;
             }
         }
@@ -563,6 +563,19 @@
             return null;
         }
         
+        function formatTime(timeValue) {
+            // シリアル値を時刻文字列に変換
+            if (typeof timeValue === 'number') {
+                // Excelのシリアル値（0.5 = 12:00）
+                const totalMinutes = Math.round(timeValue * 24 * 60);
+                const hours = Math.floor(totalMinutes / 60);
+                const minutes = totalMinutes % 60;
+                return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+            }
+            // すでに文字列の場合はそのまま返す
+            return timeValue || '';
+        }
+        
         function getSeedTeam(games) {
             // 5試合目の後攻チーム（2番目のチーム）がシード
             const game5 = games.filter(g => g.gameNum === 5);
@@ -574,7 +587,7 @@
         
         function displayTournament(data, scheduleData = {}) {
             if (!data.games || data.games.length === 0) {
-                document.getElementById('content').innerHTML = 
+                document.getElementById('content').innerHTML = 
                     '<div class="loading">試合データがありません</div>';
                 return;
             }
@@ -624,6 +637,7 @@
                     <div class="tournament-title">決勝トーナメント</div>
                     
                     <div class="tournament-container">
+                        <!-- 1回戦 -->
                         <div class="round round-1">
                             <div class="round-title">1回戦</div>
                             <div class="round-matches">
@@ -645,37 +659,49 @@
                 html += '<div class="court-spacer"></div>';
             }
             
-            // Bコートの試合
-            round1ByCourtB.forEach((gameNum, idx) => {
+            // Bコートの試合（2試合目まで）
+            const bCourtGames = round1ByCourtB.filter(gn => gn !== 3);
+            bCourtGames.forEach((gameNum, idx) => {
                 const match = matches[gameNum];
                 const winner = determineWinner(match);
-                const lineClass = idx === round1ByCourtB.length - 1 && seedTeam ? 'line-bracket-bottom' : 'line-bracket-top';
+                const lineClass = 'line-bracket-top';
                 const isActive = winner !== null;
                 const schedule = scheduleData[gameNum];
                 
                 html += renderMatchCard(match, gameNum, lineClass, isActive, schedule);
             });
             
-            // シード枠
+            // シード枠（Bコート第2試合の下）
             if (seedTeam) {
-                const lineClass = 'line-bracket-bottom';
                 const schedule = scheduleData[5];
-                const scheduleInfo = schedule ? `${schedule.time} ${schedule.court}コート` : 'シード';
+                const scheduleInfo = schedule ? `${formatTime(schedule.time)} ${schedule.court}コート` : 'シード';
                 html += `
                     <div class="match-card seed-card">
                         <div class="match-info">${scheduleInfo}</div>
                         <div class="seed-info">
                             <span class="seed-icon">⭐</span>${seedTeam}
                         </div>
-                        <div class="${lineClass} active"></div>
+                        <div class="line-bracket-bottom active"></div>
                     </div>
                 `;
+            }
+            
+            // Bコート第3試合（一番下）
+            if (round1ByCourtB.includes(3)) {
+                const match = matches[3];
+                const winner = determineWinner(match);
+                const lineClass = 'line-bracket-top';
+                const isActive = winner !== null;
+                const schedule = scheduleData[3];
+                
+                html += renderMatchCard(match, 3, lineClass, isActive, schedule);
             }
             
             html += `
                             </div>
                         </div>
                         
+                        <!-- 準決勝 -->
                         <div class="round round-2">
                             <div class="round-title">準決勝</div>
                             <div class="round-matches">
@@ -692,12 +718,7 @@
                 html += renderMatchCard(match, gameNum, lineClass, isActive, schedule);
             });
             
-            // スペーサー
-            if (sfByCourtA.length > 0 && sfByCourtB.length > 0) {
-                html += '<div class="court-spacer"></div>';
-            }
-            
-            // Bコートの試合
+            // Bコート第5試合（中間位置）
             sfByCourtB.forEach(gameNum => {
                 const match = matches[gameNum];
                 const winner = determineWinner(match);
@@ -712,6 +733,7 @@
                             </div>
                         </div>
                         
+                        <!-- 決勝 -->
                         <div class="round round-3">
                             <div class="champion-label">決勝</div>
                             <div class="final-matches-wrapper">
@@ -771,29 +793,12 @@
             
             document.getElementById('content').innerHTML = html;
         }
-
-        function openScoreboard(court, gameNum) {
-            if (!court) return;
-            const params = new URLSearchParams();
-            if (API_URL) params.set('api', API_URL);
-            params.set('court', court);
-            params.set('game', gameNum);
-            
-            window.location.href = `scoreboard.html?${params.toString()}`;
-        }
-        
-        function goBack() {
-            const params = new URLSearchParams();
-            if (API_URL) params.set('api', API_URL);
-            window.location.href = `index.html?${params.toString()}`;
-        }
-        
-        // 🚨 修正ポイント: renderMatchCardの二重定義を解消し、正しい定義を残しました
         function renderMatchCard(match, gameNum, lineClass, isLineActive, schedule = null) {
             // 試合予定情報を取得
             let matchInfoText = `第${gameNum}試合`;
             if (schedule) {
-                matchInfoText = `${schedule.time} ${schedule.court}コート`;
+                const time = formatTime(schedule.time);
+                matchInfoText = `${schedule.court}コート 第${gameNum}試合 ${time}開始予定`;
             } else if (match && match.court) {
                 matchInfoText = `${match.court}コート 第${gameNum}試合`;
             }
@@ -814,8 +819,8 @@
             }
             
             const winner = determineWinner(match);
-            const statusClass = match.status === '試合中' ? 'playing' : 
-                                match.status === '終了' ? 'finished' : '';
+            const statusClass = match.status === '試合中' ? 'playing' : 
+                               match.status === '終了' ? 'finished' : '';
             
             return `
                 <div class="match-card ${statusClass}" onclick="openScoreboard('${match.court}', ${gameNum})">
@@ -832,9 +837,3 @@
                 </div>
             `;
         }
-
-        fetchScores();
-        setInterval(fetchScores, 60000);
-    </script>
-</body>
-</html>
