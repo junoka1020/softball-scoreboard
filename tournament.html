@@ -11,30 +11,6 @@
             box-sizing: border-box;
         }
         
-        function openScoreboard(court, gameNum) {
-            if (!court) return;
-            const params = new URLSearchParams();
-            if (API_URL) params.set('api', API_URL);
-            params.set('court', court);
-            params.set('game', gameNum);
-            
-            window.location.href = `scoreboard.html?${params.toString()}`;
-        }
-        
-        function goBack() {
-            const params = new URLSearchParams();
-            if (API_URL) params.set('api', API_URL);
-            window.location.href = `index.html?${params.toString()}`;
-        }
-        
-        // 初回読み込み
-        fetchScores();
-        // 60秒ごとに自動更新
-        setInterval(fetchScores, 60000);
-    </script>
-</body>
-</html>
-        
         body {
             font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -471,6 +447,31 @@
         
         let isRefreshing = false;
         
+                // --- ここから追加 ---
+        function openScoreboard(court, gameNum) {
+            if (!court) return;
+            const params = new URLSearchParams();
+            if (API_URL) params.set('api', API_URL);
+            params.set('court', court);
+            params.set('game', gameNum);
+            
+            window.location.href = `scoreboard.html?${params.toString()}`;
+        }
+        
+        function goBack() {
+            const params = new URLSearchParams();
+            if (API_URL) params.set('api', API_URL);
+            window.location.href = `index.html?${params.toString()}`;
+        }
+
+        // 初回読み込みと自動更新の設定
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchScores();
+            // 60秒ごとに自動更新
+            setInterval(fetchScores, 60000);
+        });
+        // --- ここまで追加 ---
+        
         // トーナメント構造定義（7チーム）
         const TOURNAMENT_STRUCTURE = {
             round1: [1, 2, 3],     // 1回戦（3試合 + 1シード）
@@ -546,21 +547,6 @@
                     `<div class="loading">データの読み込みに失敗しました<br>
                     <small style="margin-top:10px;display:block;">${error.message}</small></div>`;
             }
-        }
-        
-        async function manualRefresh() {
-            if (isRefreshing) return;
-            
-            isRefreshing = true;
-            const btn = document.getElementById('refreshBtn');
-            btn.disabled = true;
-            
-            await fetchScores();
-            
-            setTimeout(() => {
-                isRefreshing = false;
-                btn.disabled = false;
-            }, 2000);
         }
         
         async function manualRefresh() {
