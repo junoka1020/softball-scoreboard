@@ -98,15 +98,15 @@
         .round {
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             gap: 20px;
             flex-shrink: 0;
             position: relative;
         }
         
-        .round-1 { min-height: 600px; }
-        .round-2 { min-height: 600px; }
-        .round-3 { min-height: 600px; }
+        .round-1 { min-height: 700px; }
+        .round-2 { min-height: 700px; }
+        .round-3 { min-height: 700px; }
         
         .round-title {
             text-align: center;
@@ -122,9 +122,13 @@
         .round-matches {
             display: flex;
             flex-direction: column;
-            justify-content: center;
             gap: 20px;
             margin-top: 40px;
+        }
+        
+        /* コート別配置用のスペーサー */
+        .court-spacer {
+            height: 60px;
         }
         
         /* 試合カード（箱） */
@@ -284,9 +288,8 @@
         
         /* 3位決定戦エリア */
         .third-place-container {
-            margin-top: 50px;
-            border-top: 2px dashed #ccc;
-            padding-top: 20px;
+            margin-top: 20px;
+            padding-top: 0;
         }
         
         .third-place-title {
@@ -306,6 +309,16 @@
             top: 0;
             left: 0;
             right: 0;
+        }
+        
+        /* 決勝と3位決定戦を中央配置 */
+        .final-matches-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 40px;
+            min-height: 500px;
         }
         
         /* 優勝表示 */
@@ -454,7 +467,26 @@
                 }
                 
                 const data = await response.json();
-                displayTournament(data);
+                
+                // 試合予定を取得
+                const scheduleResponse = await fetch(`${API_URL}?type=schedule&t=${timestamp}`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache'
+                });
+                
+                let scheduleData = {};
+                if (scheduleResponse.ok) {
+                    const scheduleJson = await scheduleResponse.json();
+                    if (scheduleJson.schedule) {
+                        scheduleData = scheduleJson.schedule.reduce((acc, s) => {
+                            acc[s.gameNum] = s;
+                            return acc;
+                        }, {});
+                    }
+                }
+                
+                displayTournament(data, scheduleData);
                 
                 document.getElementById('updateTime').textContent = 
                     `最終更新: ${data.lastUpdate}`;
@@ -526,29 +558,15 @@
         }
         
         function getSeedTeam(games) {
-            // 準決勝に出場するチームのうち、1回戦に出ていないチームを探す
-            const semiFinalTeams = new Set();
-            for (let gameNum of TOURNAMENT_STRUCTURE.semiFinals) {
-                const sfGames = games.filter(g => g.gameNum === gameNum);
-                sfGames.forEach(g => semiFinalTeams.add(g.team));
+            // 5試合目の後攻チーム（2番目のチーム）がシード
+            const game5 = games.filter(g => g.gameNum === 5);
+            if (game5.length >= 2) {
+                return game5[1].team; // 2番目のチームがシード
             }
-            
-            const round1Teams = new Set();
-            for (let gameNum of TOURNAMENT_STRUCTURE.round1) {
-                const r1Games = games.filter(g => g.gameNum === gameNum);
-                r1Games.forEach(g => round1Teams.add(g.team));
-            }
-            
-            for (let team of semiFinalTeams) {
-                if (!round1Teams.has(team)) {
-                    return team;
-                }
-            }
-            
             return null;
         }
         
-        function displayTournament(data) {
+        function displayTournament(data, scheduleData = {}) {
             if (!data.games || data.games.length === 0) {
                 document.getElementById('content').innerHTML = 
                     '<div class="loading">試合データがありません</div>';
@@ -569,11 +587,31 @@
             
             const seedTeam = getSeedTeam(data.games);
             
-            // 勝者追跡
-            const r1Winners = TOURNAMENT_STRUCTURE.round1.map(gn => getWinnerName(matches[gn]));
-            const sfWinners = TOURNAMENT_STRUCTURE.semiFinals.map(gn => getWinnerName(matches[gn]));
-            const finalWinner = getWinnerName(matches[TOURNAMENT_STRUCTURE.final[0]]);
-            const thirdPlaceWinner = getWinnerName(matches[TOURNAMENT_STRUCTURE.thirdPlace[0]]);
+            // コート別に試合を分類
+            const round1ByCourtA = [];
+            const round1ByCourtB = [];
+            const sfByCourtA = [];
+            const sfByCourtB = [];
+            
+            TOURNAMENT_STRUCTURE.round1.forEach(gameNum => {
+                const schedule = scheduleData[gameNum];
+                const court = schedule ? schedule.court : (matches[gameNum] ? matches[gameNum].court : null);
+                if (court === 'A' || court === 'Aコート') {
+                    round1ByCourtA.push(gameNum);
+                } else {
+                    round1ByCourtB.push(gameNum);
+                }
+            });
+            
+            TOURNAMENT_STRUCTURE.semiFinals.forEach(gameNum => {
+                const schedule = scheduleData[gameNum];
+                const court = schedule ? schedule.court : (matches[gameNum] ? matches[gameNum].court : null);
+                if (court === 'A' || court === 'Aコート') {
+                    sfByCourtA.push(gameNum);
+                } else {
+                    sfByCourtB.push(gameNum);
+                }
+            });
             
             let html = `
                 <div class="tournament-wrapper">
@@ -586,22 +624,41 @@
                             <div class="round-matches">
             `;
             
-            // 1回戦の試合を表示
-            TOURNAMENT_STRUCTURE.round1.forEach((gameNum, idx) => {
+            // Aコートの試合
+            round1ByCourtA.forEach((gameNum, idx) => {
                 const match = matches[gameNum];
                 const winner = determineWinner(match);
-                const lineClass = idx % 2 === 0 ? 'line-bracket-top' : 'line-bracket-bottom';
+                const lineClass = 'line-bracket-top';
                 const isActive = winner !== null;
+                const schedule = scheduleData[gameNum];
                 
-                html += renderMatchCard(match, gameNum, lineClass, isActive);
+                html += renderMatchCard(match, gameNum, lineClass, isActive, schedule);
+            });
+            
+            // スペーサー
+            if (round1ByCourtA.length > 0 && round1ByCourtB.length > 0) {
+                html += '<div class="court-spacer"></div>';
+            }
+            
+            // Bコートの試合
+            round1ByCourtB.forEach((gameNum, idx) => {
+                const match = matches[gameNum];
+                const winner = determineWinner(match);
+                const lineClass = idx === round1ByCourtB.length - 1 && seedTeam ? 'line-bracket-bottom' : 'line-bracket-top';
+                const isActive = winner !== null;
+                const schedule = scheduleData[gameNum];
+                
+                html += renderMatchCard(match, gameNum, lineClass, isActive, schedule);
             });
             
             // シード枠
             if (seedTeam) {
                 const lineClass = 'line-bracket-bottom';
+                const schedule = scheduleData[5];
+                const scheduleInfo = schedule ? `${schedule.time} ${schedule.court}コート` : 'シード';
                 html += `
                     <div class="match-card seed-card">
-                        <div class="match-info">シード</div>
+                        <div class="match-info">${scheduleInfo}</div>
                         <div class="seed-info">
                             <span class="seed-icon">⭐</span>${seedTeam}
                         </div>
@@ -620,14 +677,31 @@
                             <div class="round-matches">
             `;
             
-            // 準決勝の試合を表示
-            TOURNAMENT_STRUCTURE.semiFinals.forEach((gameNum, idx) => {
+            // Aコートの試合
+            sfByCourtA.forEach(gameNum => {
                 const match = matches[gameNum];
                 const winner = determineWinner(match);
-                const lineClass = idx === 0 ? 'line-bracket-top' : 'line-bracket-bottom';
+                const lineClass = 'line-bracket-top';
                 const isActive = winner !== null;
+                const schedule = scheduleData[gameNum];
                 
-                html += renderMatchCard(match, gameNum, lineClass, isActive);
+                html += renderMatchCard(match, gameNum, lineClass, isActive, schedule);
+            });
+            
+            // スペーサー
+            if (sfByCourtA.length > 0 && sfByCourtB.length > 0) {
+                html += '<div class="court-spacer"></div>';
+            }
+            
+            // Bコートの試合
+            sfByCourtB.forEach(gameNum => {
+                const match = matches[gameNum];
+                const winner = determineWinner(match);
+                const lineClass = 'line-bracket-bottom';
+                const isActive = winner !== null;
+                const schedule = scheduleData[gameNum];
+                
+                html += renderMatchCard(match, gameNum, lineClass, isActive, schedule);
             });
             
             html += `
@@ -637,24 +711,26 @@
                         <!-- 決勝 -->
                         <div class="round round-3">
                             <div class="champion-label">決勝</div>
-                            <div class="round-matches">
+                            <div class="final-matches-wrapper">
             `;
             
             // 決勝戦を表示
             const finalMatch = matches[TOURNAMENT_STRUCTURE.final[0]];
-            html += renderMatchCard(finalMatch, TOURNAMENT_STRUCTURE.final[0], null, false);
+            const finalSchedule = scheduleData[TOURNAMENT_STRUCTURE.final[0]];
+            html += renderMatchCard(finalMatch, TOURNAMENT_STRUCTURE.final[0], null, false, finalSchedule);
             
             // 3位決定戦
             html += `
-                            </div>
-                            <div class="third-place-container">
-                                <div class="third-place-title">🥉 3位決定戦</div>
+                                <div class="third-place-container">
+                                    <div class="third-place-title">🥉 3位決定戦</div>
             `;
             
             const thirdPlaceMatch = matches[TOURNAMENT_STRUCTURE.thirdPlace[0]];
-            html += renderMatchCard(thirdPlaceMatch, TOURNAMENT_STRUCTURE.thirdPlace[0], null, false);
+            const thirdSchedule = scheduleData[TOURNAMENT_STRUCTURE.thirdPlace[0]];
+            html += renderMatchCard(thirdPlaceMatch, TOURNAMENT_STRUCTURE.thirdPlace[0], null, false, thirdSchedule);
             
             html += `
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -690,11 +766,49 @@
             document.getElementById('content').innerHTML = html;
         }
         
-        function renderMatchCard(match, gameNum, lineClass, isLineActive) {
+            if (finalWinner) {
+                html += `
+                    <div class="champion-section">
+                        <div class="champion-trophy">🏆</div>
+                        <div class="champion-title">優勝</div>
+                        <div class="champion-name">${finalWinner}</div>
+                `;
+                
+                if (thirdPlaceWinner) {
+                    html += `
+                        <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid rgba(133, 100, 4, 0.3);">
+                            <div style="font-size: 0.9em; color: #856404; margin-bottom: 5px;">🥉 第3位</div>
+                            <div style="font-size: 1.5em; font-weight: bold; color: #333;">${thirdPlaceWinner}</div>
+                        </div>
+                    `;
+                }
+                
+                html += `
+                    </div>
+                `;
+            }
+            
+            html += `
+                </div>
+            `;
+            
+            document.getElementById('content').innerHTML = html;
+        }
+        
+        function renderMatchCard(match, gameNum, lineClass, isLineActive, schedule = null) {
+        function renderMatchCard(match, gameNum, lineClass, isLineActive, schedule = null) {
+            // 試合予定情報を取得
+            let matchInfoText = `第${gameNum}試合`;
+            if (schedule) {
+                matchInfoText = `${schedule.time} ${schedule.court}コート`;
+            } else if (match && match.court) {
+                matchInfoText = `${match.court}コート 第${gameNum}試合`;
+            }
+            
             if (!match) {
                 return `
                     <div class="match-card">
-                        <div class="match-info">第${gameNum}試合</div>
+                        <div class="match-info">${matchInfoText}</div>
                         <div class="team">
                             <span class="team-name tbd">未定</span>
                         </div>
@@ -710,11 +824,9 @@
             const statusClass = match.status === '試合中' ? 'playing' : 
                                match.status === '終了' ? 'finished' : '';
             
-            const matchInfo = match.court ? `${match.court}コート 第${gameNum}試合` : `第${gameNum}試合`;
-            
             return `
                 <div class="match-card ${statusClass}" onclick="openScoreboard('${match.court}', ${gameNum})">
-                    <div class="match-info ${statusClass}">${matchInfo} - ${match.status}</div>
+                    <div class="match-info ${statusClass}">${matchInfoText} - ${match.status}</div>
                     <div class="team ${winner === 1 ? 'winner-team' : ''}">
                         <span class="team-name">${match.team1.name}</span>
                         <span class="team-score">${match.team1.score}</span>
