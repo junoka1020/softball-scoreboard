@@ -447,10 +447,10 @@
         
         // トーナメント構造定義（7チーム）
         const TOURNAMENT_STRUCTURE = {
-            round1: [1, 2, 3],     // 1回戦（3試合 + 1シード）
-            semiFinals: [4, 5],    // 準決勝（2試合）
-            final: [6],            // 決勝
-            thirdPlace: [7]        // 3位決定戦
+            round1: [1, 2, 3],     // 1回戦（3試合 + 1シード）
+            semiFinals: [4, 5],    // 準決勝（2試合）
+            final: [6],            // 決勝
+            thirdPlace: [7]        // 3位決定戦
         };
         
         async function fetchScores() {
@@ -494,11 +494,11 @@
                 
                 displayTournament(data, scheduleData);
                 
-                document.getElementById('updateTime').textContent = 
+                document.getElementById('updateTime').textContent = 
                     `最終更新: ${data.lastUpdate}`;
             } catch (error) {
                 console.error('データ取得エラー:', error);
-                document.getElementById('content').innerHTML = 
+                document.getElementById('content').innerHTML = 
                     `<div class="loading">データの読み込みに失敗しました</div>`;
             }
         }
@@ -574,7 +574,7 @@
         
         function displayTournament(data, scheduleData = {}) {
             if (!data.games || data.games.length === 0) {
-                document.getElementById('content').innerHTML = 
+                document.getElementById('content').innerHTML = 
                     '<div class="loading">試合データがありません</div>';
                 return;
             }
@@ -624,7 +624,6 @@
                     <div class="tournament-title">決勝トーナメント</div>
                     
                     <div class="tournament-container">
-                        <!-- 1回戦 -->
                         <div class="round round-1">
                             <div class="round-title">1回戦</div>
                             <div class="round-matches">
@@ -677,7 +676,6 @@
                             </div>
                         </div>
                         
-                        <!-- 準決勝 -->
                         <div class="round round-2">
                             <div class="round-title">準決勝</div>
                             <div class="round-matches">
@@ -714,7 +712,6 @@
                             </div>
                         </div>
                         
-                        <!-- 決勝 -->
                         <div class="round round-3">
                             <div class="champion-label">決勝</div>
                             <div class="final-matches-wrapper">
@@ -774,6 +771,24 @@
             
             document.getElementById('content').innerHTML = html;
         }
+
+        function openScoreboard(court, gameNum) {
+            if (!court) return;
+            const params = new URLSearchParams();
+            if (API_URL) params.set('api', API_URL);
+            params.set('court', court);
+            params.set('game', gameNum);
+            
+            window.location.href = `scoreboard.html?${params.toString()}`;
+        }
+        
+        function goBack() {
+            const params = new URLSearchParams();
+            if (API_URL) params.set('api', API_URL);
+            window.location.href = `index.html?${params.toString()}`;
+        }
+        
+        // 🚨 修正ポイント: renderMatchCardの二重定義を解消し、正しい定義を残しました
         function renderMatchCard(match, gameNum, lineClass, isLineActive, schedule = null) {
             // 試合予定情報を取得
             let matchInfoText = `第${gameNum}試合`;
@@ -799,8 +814,8 @@
             }
             
             const winner = determineWinner(match);
-            const statusClass = match.status === '試合中' ? 'playing' : 
-                               match.status === '終了' ? 'finished' : '';
+            const statusClass = match.status === '試合中' ? 'playing' : 
+                                match.status === '終了' ? 'finished' : '';
             
             return `
                 <div class="match-card ${statusClass}" onclick="openScoreboard('${match.court}', ${gameNum})">
@@ -817,23 +832,7 @@
                 </div>
             `;
         }
-        
-        function openScoreboard(court, gameNum) {
-            if (!court) return;
-            const params = new URLSearchParams();
-            if (API_URL) params.set('api', API_URL);
-            params.set('court', court);
-            params.set('game', gameNum);
-            
-            window.location.href = `scoreboard.html?${params.toString()}`;
-        }
-        
-        function goBack() {
-            const params = new URLSearchParams();
-            if (API_URL) params.set('api', API_URL);
-            window.location.href = `index.html?${params.toString()}`;
-        }
-        
+
         fetchScores();
         setInterval(fetchScores, 60000);
     </script>
