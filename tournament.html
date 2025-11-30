@@ -438,6 +438,8 @@
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const API_URL = urlParams.get('api') || localStorage.getItem('STAFF_BOT_API_URL') || '';
+        // 【この行を追加】
+        window.API_URL = API_URL;
         
         if (urlParams.get('api')) {
             localStorage.setItem('STAFF_BOT_API_URL', urlParams.get('api'));
