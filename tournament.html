@@ -774,6 +774,7 @@
             
             document.getElementById('content').innerHTML = html;
         }
+        function renderMatchCard(match, gameNum, lineClass, isLineActive, schedule = null) {
             // 試合予定情報を取得
             let matchInfoText = `第${gameNum}試合`;
             if (schedule) {
