@@ -633,13 +633,13 @@
             const match1 = matches[1];
             const winner1 = determineWinner(match1);
             const schedule1 = scheduleData[1];
-            html += renderMatchCard(match1, 1, 'line-bracket-bottom', winner1 !== null, schedule1);
+            html += renderMatchCard(match1, 1, 'line-bracket-top', winner1 !== null, schedule1);
             
             // 第3試合（上側のペアの下）
             const match3 = matches[3];
             const winner3 = determineWinner(match3);
             const schedule3 = scheduleData[3];
-            html += renderMatchCard(match3, 3, 'line-bracket-top', winner3 !== null, schedule3);
+            html += renderMatchCard(match3, 3, 'line-bracket-bottom', winner3 !== null, schedule3);
             
             // 準決勝の上下のペア間のスペーサー
             html += '<div class="court-spacer"></div>';
