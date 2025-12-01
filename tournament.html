@@ -87,13 +87,11 @@
         .tournament-container {
             display: flex;
             flex-direction: row;
-            align-items: center;
+            align-items: flex-start; /* 上揃えに変更 */
             gap: 60px;
             padding-bottom: 20px;
             min-width: 900px;
         }
-        
-        /* min-heightを削除してコンテンツに応じた柔軟な配置にする */
         
         .round {
             display: flex;
@@ -109,17 +107,16 @@
             font-weight: bold;
             color: #667eea;
             font-size: 1em;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            /* absolute配置をやめてフロー配置にする */
+            margin-bottom: 10px;
+            height: 20px; /* 高さ固定で揃える */
         }
         
         .round-matches {
             display: flex;
             flex-direction: column;
             gap: 20px;
-            margin-top: 40px;
+            /* margin-top: 40px; 削除して上のmargin-bottomで調整 */
         }
         
         .court-spacer {
@@ -257,36 +254,14 @@
             z-index: 3;
         }
         
-        .third-place-container {
-            margin-top: 20px;
-            padding-top: 0;
-        }
-        
+        /* 3位決定戦のタイトル位置調整 */
         .third-place-title {
             font-size: 14px;
             text-align: center;
+            margin-top: 30px; /* 決勝カードとの間隔 */
             margin-bottom: 10px;
             color: #667eea;
             font-weight: bold;
-        }
-        
-        .champion-label {
-            text-align: center;
-            font-weight: bold;
-            font-size: 1em;
-            color: #667eea;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-        }
-        
-        .final-matches-wrapper {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin-top: 50px;
         }
         
         .champion-section {
@@ -629,13 +604,13 @@
             `;
             
             // 1回戦のレンダリング
-            // 第1試合（上側のペアの上）
+            // 第1試合（上側のペアの上） - 【修正】線が上に折れるように 'line-bracket-top' を指定
             const match1 = matches[1];
             const winner1 = determineWinner(match1);
             const schedule1 = scheduleData[1];
             html += renderMatchCard(match1, 1, 'line-bracket-top', winner1 !== null, schedule1);
             
-            // 第3試合（上側のペアの下）
+            // 第3試合（上側のペアの下） - 【修正】線が下に折れるように 'line-bracket-bottom' を指定
             const match3 = matches[3];
             const winner3 = determineWinner(match3);
             const schedule3 = scheduleData[3];
@@ -654,6 +629,7 @@
             if (seedTeam) {
                 const schedule = scheduleData[5];
                 const scheduleInfo = schedule ? `${formatTime(schedule.time)} ${schedule.court}コート` : 'シード';
+                // シードも下向きに折れる線が必要
                 html += `
                     <div class="match-card seed-card">
                         <div class="match-info">${scheduleInfo}</div>
@@ -674,22 +650,19 @@
                             <div class="round-matches">
             `;
             
-            // 準決勝の開始位置を1回戦カードの中央に合わせるためのオフセット
-            // 試合カード(約100px) + gap(20px) = 120px、その半分 = 60px
+            // 準決勝の開始位置調整
             html += '<div style="height: 60px;"></div>';
             
-            // 第4試合（上側）- 第1試合と第3試合の中央に配置
+            // 第4試合（上側）
             const match4 = matches[4];
             const winner4 = determineWinner(match4);
             const schedule4 = scheduleData[4];
             html += renderMatchCard(match4, 4, 'line-bracket-top', winner4 !== null, schedule4);
             
             // 準決勝カード間のスペーサー
-            // (第1・第3のペアと第2・シードのペアの間のスペース) + 試合カード高さ
-            // court-spacer(60px) + 試合カード(100px) + gap(20px) = 180px
             html += '<div style="height: 180px;"></div>';
             
-            // 第5試合（下側）- 第2試合とシードカードの中央に配置
+            // 第5試合（下側）
             const match5 = matches[5];
             const winner5 = determineWinner(match5);
             const schedule5 = scheduleData[5];
@@ -700,14 +673,20 @@
                         </div>
                         
                         <div class="round round-3">
-                            <div class="champion-label">決勝</div>
-                            <div class="final-matches-wrapper">
+                            <div class="round-title">決勝</div>
+                            <div class="round-matches">
             `;
             
-            // 3位決定戦（第6試合）
-            html += `<div class="third-place-container">
-                        <div class="third-place-title">🥉 3位決定戦</div>`;
+            // 決勝の開始位置調整（準決勝の間くらいに持ってくるため）
+            html += '<div style="height: 190px;"></div>';
+
+            // 【修正】決勝戦（第7試合）を先に表示
+            const finalMatch = matches[TOURNAMENT_STRUCTURE.final[0]];
+            const finalSchedule = scheduleData[TOURNAMENT_STRUCTURE.final[0]];
+            html += renderMatchCard(finalMatch, TOURNAMENT_STRUCTURE.final[0], null, false, finalSchedule);
             
+            // 【修正】3位決定戦（第6試合）を下に表示
+            html += `<div class="third-place-title">🥉 3位決定戦</div>`;
             const thirdPlaceMatch = matches[TOURNAMENT_STRUCTURE.thirdPlace[0]];
             const thirdSchedule = scheduleData[TOURNAMENT_STRUCTURE.thirdPlace[0]];
             html += renderMatchCard(thirdPlaceMatch, TOURNAMENT_STRUCTURE.thirdPlace[0], null, false, thirdSchedule);
@@ -718,12 +697,7 @@
                     </div>
             `;
             
-            // 決勝戦（第7試合）
-            const finalMatch = matches[TOURNAMENT_STRUCTURE.final[0]];
-            const finalSchedule = scheduleData[TOURNAMENT_STRUCTURE.final[0]];
-            html += renderMatchCard(finalMatch, TOURNAMENT_STRUCTURE.final[0], null, false, finalSchedule);
-            
-            // 優勝・3位表示
+            // 優勝・3位表示（ページ下部）
             const finalWinner = getWinnerName(finalMatch);
             const thirdPlaceWinner = getWinnerName(thirdPlaceMatch);
             
@@ -786,12 +760,15 @@
             }
             
             const winner = determineWinner(match);
-            const statusClass = match.status === '試合中' ? 'playing' : 
-                               match.status === '終了' ? 'finished' : '';
+            const statusClass = match.status === '試合中' ? 'playing' :
+                                match.status === '終了' ? 'finished' : '';
+            
+            // 【修正】「待機」の場合はステータス文字を表示しない
+            const statusDisplay = match.status === '待機' ? '' : ` - ${match.status}`;
             
             return `
                 <div class="match-card ${statusClass}" onclick="openScoreboard('${match.court}', ${gameNum})">
-                    <div class="match-info ${statusClass}">${matchInfoText} - ${match.status}</div>
+                    <div class="match-info ${statusClass}">${matchInfoText}${statusDisplay}</div>
                     <div class="team ${winner === 1 ? 'winner-team' : ''}">
                         <span class="team-name">${match.team1.name}</span>
                         <span class="team-score">${match.team1.score}</span>
