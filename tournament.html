@@ -525,22 +525,39 @@
         }
         
         function formatTime(timeValue) {
+            if (!timeValue) return '';
+            
+            // 数値（Excelシリアル値）の場合
             if (typeof timeValue === 'number') {
-                // Excelのシリアル値を時刻に変換（0.5 = 12:00）
                 const totalMinutes = Math.round(timeValue * 24 * 60);
                 const hours = Math.floor(totalMinutes / 60);
                 const minutes = totalMinutes % 60;
                 return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
             }
-            // 既に文字列の場合
+            
+            // 文字列の場合
             if (typeof timeValue === 'string') {
-                // "HH:MM" 形式かチェック
+                // ISO形式の日付文字列（例: "1899-12-30T01:00:00.000Z"）
+                if (timeValue.includes('T')) {
+                    try {
+                        const date = new Date(timeValue);
+                        const hours = date.getUTCHours();
+                        const minutes = date.getUTCMinutes();
+                        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                    } catch (e) {
+                        console.error('時刻パースエラー:', e);
+                    }
+                }
+                
+                // "HH:MM" 形式の場合
                 if (/^\d{1,2}:\d{2}$/.test(timeValue)) {
                     const [h, m] = timeValue.split(':');
                     return `${String(h).padStart(2, '0')}:${m}`;
                 }
+                
                 return timeValue;
             }
+            
             return '';
         }
         
