@@ -754,11 +754,20 @@
         
         function renderMatchCard(match, gameNum, lineClass, isLineActive, schedule = null) {
             let matchInfoText = `第${gameNum}試合`;
-            if (schedule) {
-                const time = formatTime(schedule.time);
-                matchInfoText = `${schedule.court}コート 第${gameNum}試合 ${time}開始予定`;
-            } else if (match && match.court) {
-                matchInfoText = `${match.court}コート 第${gameNum}試合`;
+            
+            // 試合中または終了の場合は時刻を表示しない
+            if (match && (match.status === '試合中' || match.status === '終了')) {
+                if (match.court) {
+                    matchInfoText = `${match.court}コート 第${gameNum}試合`;
+                }
+            } else {
+                // 待機中の場合のみ開始予定時刻を表示
+                if (schedule) {
+                    const time = formatTime(schedule.time);
+                    matchInfoText = `${schedule.court}コート 第${gameNum}試合 ${time}開始予定`;
+                } else if (match && match.court) {
+                    matchInfoText = `${match.court}コート 第${gameNum}試合`;
+                }
             }
             
             if (!match) {
