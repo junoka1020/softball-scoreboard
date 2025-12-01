@@ -604,20 +604,20 @@
             `;
             
             // 1回戦のレンダリング
-            // 第1試合（上側のペアの上） - 【修正】線が上に折れるように 'line-bracket-top' を指定
+            // 第1試合（上側のペアの上）
             const match1 = matches[1];
             const winner1 = determineWinner(match1);
             const schedule1 = scheduleData[1];
             html += renderMatchCard(match1, 1, 'line-bracket-top', winner1 !== null, schedule1);
             
-            // 第3試合（上側のペアの下） - 【修正】線が下に折れるように 'line-bracket-bottom' を指定
+            // 第3試合（上側のペアの下）
             const match3 = matches[3];
             const winner3 = determineWinner(match3);
             const schedule3 = scheduleData[3];
             html += renderMatchCard(match3, 3, 'line-bracket-bottom', winner3 !== null, schedule3);
             
-            // 準決勝の上下のペア間のスペーサー
-            html += '<div class="court-spacer"></div>';
+            // 【変更点1】 1回戦の上下ペアの間隔を短くする (60px -> 20px)
+            html += '<div class="court-spacer" style="height: 20px;"></div>';
             
             // 第2試合（下側のペアの上）
             const match2 = matches[2];
@@ -629,7 +629,6 @@
             if (seedTeam) {
                 const schedule = scheduleData[5];
                 const scheduleInfo = schedule ? `${formatTime(schedule.time)} ${schedule.court}コート` : 'シード';
-                // シードも下向きに折れる線が必要
                 html += `
                     <div class="match-card seed-card">
                         <div class="match-info">${scheduleInfo}</div>
@@ -650,7 +649,7 @@
                             <div class="round-matches">
             `;
             
-            // 準決勝の開始位置調整
+            // 準決勝の開始位置調整（ここは変更なし）
             html += '<div style="height: 60px;"></div>';
             
             // 第4試合（上側）
@@ -659,8 +658,8 @@
             const schedule4 = scheduleData[4];
             html += renderMatchCard(match4, 4, 'line-bracket-top', winner4 !== null, schedule4);
             
-            // 準決勝カード間のスペーサー
-            html += '<div style="height: 180px;"></div>';
+            // 【変更点2】 準決勝同士の間隔も連動して短くする (180px -> 140px)
+            html += '<div style="height: 140px;"></div>';
             
             // 第5試合（下側）
             const match5 = matches[5];
@@ -677,16 +676,15 @@
                             <div class="round-matches">
             `;
             
-            // 【調整】決勝戦の位置合わせ（準決勝の真ん中に来るようにスペーサーを入れる）
-            // 準決勝上: height 60px開始, 準決勝下: height 340px開始 -> 中心は約200px
-            html += '<div style="height: 200px;"></div>';
+            // 【変更点3】 決勝戦の位置合わせ（全体の縮小に合わせて少し上に詰める 200px -> 180px）
+            html += '<div style="height: 180px;"></div>';
 
             // 決勝戦（第7試合）
             const finalMatch = matches[TOURNAMENT_STRUCTURE.final[0]];
             const finalSchedule = scheduleData[TOURNAMENT_STRUCTURE.final[0]];
             html += renderMatchCard(finalMatch, TOURNAMENT_STRUCTURE.final[0], null, false, finalSchedule);
             
-            // 【調整】3位決定戦のタイトル（決勝戦との間隔を50px空ける）
+            // 3位決定戦のタイトル
             html += `<div class="third-place-title" style="margin-top: 50px;">🥉 3位決定戦</div>`;
             
             // 3位決定戦（第6試合）
@@ -700,7 +698,7 @@
                     </div>
             `;
             
-            // 優勝・3位表示（ページ下部）
+            // ...（後略：優勝者表示などはそのまま）...
             const finalWinner = getWinnerName(finalMatch);
             const thirdPlaceWinner = getWinnerName(thirdPlaceMatch);
             
