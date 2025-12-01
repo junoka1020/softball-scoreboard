@@ -677,16 +677,19 @@
                             <div class="round-matches">
             `;
             
-            // 決勝の開始位置調整（準決勝の間くらいに持ってくるため）
-            html += '<div style="height: 190px;"></div>';
+            // 【調整】決勝戦の位置合わせ（準決勝の真ん中に来るようにスペーサーを入れる）
+            // 準決勝上: height 60px開始, 準決勝下: height 340px開始 -> 中心は約200px
+            html += '<div style="height: 200px;"></div>';
 
-            // 【修正】決勝戦（第7試合）を先に表示
+            // 決勝戦（第7試合）
             const finalMatch = matches[TOURNAMENT_STRUCTURE.final[0]];
             const finalSchedule = scheduleData[TOURNAMENT_STRUCTURE.final[0]];
             html += renderMatchCard(finalMatch, TOURNAMENT_STRUCTURE.final[0], null, false, finalSchedule);
             
-            // 【修正】3位決定戦（第6試合）を下に表示
-            html += `<div class="third-place-title">🥉 3位決定戦</div>`;
+            // 【調整】3位決定戦のタイトル（決勝戦との間隔を50px空ける）
+            html += `<div class="third-place-title" style="margin-top: 50px;">🥉 3位決定戦</div>`;
+            
+            // 3位決定戦（第6試合）
             const thirdPlaceMatch = matches[TOURNAMENT_STRUCTURE.thirdPlace[0]];
             const thirdSchedule = scheduleData[TOURNAMENT_STRUCTURE.thirdPlace[0]];
             html += renderMatchCard(thirdPlaceMatch, TOURNAMENT_STRUCTURE.thirdPlace[0], null, false, thirdSchedule);
