@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ソフトボール大会</title>
+    <title>ソフトボール大会2025</title>
     <style>
         * {
             margin: 0;
@@ -12,55 +12,108 @@
         }
         
         body {
-            font-family: 'Hiragino Kaku Gothic Pro', 'メイリオ', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            background: #f5f5f5;
+            color: #333;
         }
         
+        /* ヘッダー */
         header {
-            background: white;
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: #003366;
+            color: white;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
-        h1 {
-            font-size: 1.3em;
-            color: #667eea;
+        .header-top {
+            background: #002244;
+            padding: 8px 0;
+            font-size: 0.85em;
+        }
+        
+        .header-top-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .update-time {
-            font-size: 0.85em;
-            color: #666;
-            margin-top: 5px;
+            color: #aaa;
         }
         
-        .gallery-slider {
-            background: white;
-            padding: 15px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            cursor: pointer;
+        .header-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
-        .gallery-title {
-            font-size: 0.9em;
-            color: #667eea;
+        .logo {
+            font-size: 1.5em;
             font-weight: bold;
-            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: opacity 0.3s;
+        }
+        
+        .nav-links a:hover {
+            opacity: 0.7;
+        }
+        
+        /* メインビジュアル */
+        .hero {
+            background: linear-gradient(to right, #003366, #005599);
+            color: white;
+            padding: 60px 20px;
             text-align: center;
         }
         
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        /* 写真スライダー */
+        .photo-slider-section {
+            background: white;
+            padding: 0;
+        }
+        
         .slider-container {
+            max-width: 1200px;
+            margin: 0 auto;
             position: relative;
-            width: 100%;
-            height: 200px;
+            height: 400px;
             overflow: hidden;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
         .slider-track {
@@ -76,80 +129,109 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 3em;
         }
         
         .slide img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: block;
         }
         
         .slide.placeholder {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #003366 0%, #005599 100%);
+            color: white;
+            font-size: 4em;
         }
         
-        .slide.placeholder:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .slide.placeholder:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-        .slide.placeholder:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-        .slide.placeholder:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-        .slide.placeholder:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .slider-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            padding: 30px;
+            color: white;
+        }
+        
+        .slider-title {
+            font-size: 1.3em;
+            margin-bottom: 5px;
+        }
+        
+        .slider-subtitle {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
         
         .slider-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 10px;
+            z-index: 10;
         }
         
         .dot {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            background: #ddd;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
             transition: all 0.3s;
         }
         
         .dot.active {
-            background: #667eea;
-            width: 24px;
-            border-radius: 4px;
+            background: white;
+            width: 30px;
+            border-radius: 5px;
         }
         
+        /* コンテンツエリア */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            font-weight: 300;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #003366;
+            letter-spacing: 1px;
+        }
+        
+        /* タブ */
         .tabs {
             display: flex;
-            background: white;
-            overflow-x: auto;
+            gap: 2px;
+            margin-bottom: 30px;
             border-bottom: 2px solid #e0e0e0;
-            position: sticky;
-            top: 66px;
-            z-index: 99;
         }
         
         .tab {
-            flex: 1;
-            min-width: 100px;
-            padding: 15px;
-            text-align: center;
-            background: white;
+            padding: 15px 30px;
+            background: #f5f5f5;
             border: none;
             font-size: 1em;
-            font-weight: bold;
             color: #666;
             cursor: pointer;
             transition: all 0.3s;
-            border-bottom: 3px solid transparent;
+            border-top: 3px solid transparent;
         }
         
         .tab.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
+            background: white;
+            color: #003366;
+            border-top-color: #003366;
+            font-weight: bold;
         }
         
-        .content {
-            padding: 15px;
+        .tab:hover:not(.active) {
+            background: #fff;
         }
         
         .court-content {
@@ -160,287 +242,385 @@
             display: block;
         }
         
+        /* 試合カード */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
         .game-card {
             background: white;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
             cursor: pointer;
             transition: all 0.3s;
         }
         
         .game-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         
         .game-header {
+            background: #f8f8f8;
+            padding: 12px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
             border-bottom: 1px solid #e0e0e0;
         }
         
         .game-number {
-            font-size: 0.9em;
-            color: #666;
             font-weight: bold;
+            color: #003366;
         }
         
         .status {
             padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 0.8em;
+            border-radius: 3px;
+            font-size: 0.85em;
             font-weight: bold;
         }
         
         .status.playing {
-            background: #ff6b6b;
+            background: #d32f2f;
             color: white;
         }
         
         .status.waiting {
-            background: #95a5a6;
+            background: #757575;
             color: white;
         }
         
         .status.finished {
-            background: #2ecc71;
+            background: #388e3c;
             color: white;
         }
         
         .matchup {
+            padding: 20px 15px;
+        }
+        
+        .team-row {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 10px;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
         }
         
-        .team {
-            flex: 1;
+        .team-row:last-child {
+            border-bottom: none;
+        }
+        
+        .team-name {
             font-size: 1.1em;
+            font-weight: 500;
+        }
+        
+        .team-score {
+            font-size: 1.8em;
             font-weight: bold;
-            color: #333;
-        }
-        
-        .team.home {
-            text-align: left;
-        }
-        
-        .team.away {
+            color: #003366;
+            min-width: 50px;
             text-align: right;
         }
         
-        .score-display {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .scores {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #333;
-        }
-        
-        .score-separator {
-            color: #999;
-            font-size: 0.8em;
-        }
-        
         .inning-info {
-            font-size: 0.85em;
+            text-align: center;
+            padding: 8px;
+            background: #f8f8f8;
+            font-size: 0.9em;
             color: #666;
-            background: #f5f5f5;
-            padding: 3px 10px;
-            border-radius: 10px;
         }
         
-        .no-games {
-            text-align: center;
-            padding: 40px 20px;
-            color: white;
-            font-size: 1.1em;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 40px 20px;
-            color: white;
-            font-size: 1.1em;
-        }
-        
-        .refresh-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: white;
-            color: #667eea;
-            border: none;
-            font-size: 1.5em;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: all 0.3s;
-        }
-        
-        .refresh-btn:hover:not(:disabled) {
-            transform: scale(1.1);
-        }
-        
-        .refresh-btn:disabled {
-            opacity: 0.5;
-        }
-        
+        /* クイックリンク */
         .quick-links {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            padding: 15px;
-            background: rgba(255,255,255,0.1);
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
         }
         
-        .link-btn {
+        .link-card {
             background: white;
-            color: #667eea;
-            border: none;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 0.95em;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-        
-        .link-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        
-        .gallery-note {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 30px 20px;
             text-align: center;
-            color: #999;
-            font-size: 0.85em;
-            margin-top: 5px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s;
         }
         
-        .slide-loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+        .link-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+            border-color: #003366;
+        }
+        
+        .link-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        
+        .link-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .link-description {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        /* フッター */
+        footer {
+            background: #002244;
             color: white;
-            font-size: 0.4em;
+            padding: 40px 20px;
+            margin-top: 60px;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.9em;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        
+        .footer-links a:hover {
+            opacity: 1;
+        }
+        
+        .copyright {
+            font-size: 0.85em;
+            opacity: 0.6;
+        }
+        
+        /* ローディング */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f0f0f0;
+            border-top: 4px solid #003366;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            .header-main {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+            }
+            
+            .hero h1 {
+                font-size: 1.8em;
+            }
+            
+            .slider-container {
+                height: 250px;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+            }
+            
+            .tab {
+                padding: 12px 20px;
+                white-space: nowrap;
+            }
+            
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 15px;
+            }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>⚾ ソフトボール大会 ⚾</h1>
-        <div class="update-time" id="updateTime">読み込み中...</div>
-    </header>
-    
-    <div class="gallery-slider" onclick="openGallery()">
-        <div class="gallery-title">📸 フォトギャラリー</div>
-        <div class="slider-container">
-            <div class="slider-track" id="sliderTrack">
-                <div class="slide placeholder">📷</div>
-                <div class="slide placeholder">🏆</div>
-                <div class="slide placeholder">⚾</div>
-                <div class="slide placeholder">🎯</div>
-                <div class="slide placeholder">🥇</div>
+        <div class="header-top">
+            <div class="header-top-content">
+                <div class="update-time" id="updateTime">読み込み中...</div>
+                <div>2025年度大会</div>
             </div>
         </div>
-        <div class="slider-dots" id="sliderDots"></div>
-        <div class="gallery-note" id="galleryNote">※ 写真を読み込み中...</div>
+        <div class="header-main">
+            <div class="logo">⚾ SOFTBALL TOURNAMENT</div>
+            <nav class="nav-links">
+                <a href="#" onclick="openPage('schedule.html'); return false;">スケジュール</a>
+                <a href="#" onclick="openPage('tournament.html'); return false;">トーナメント</a>
+                <a href="#" onclick="openPage('teams.html'); return false;">チーム</a>
+                <a href="#" onclick="openPage('rules.html'); return false;">ルール</a>
+                <a href="#" onclick="openPage('venue.html'); return false;">会場案内</a>
+            </nav>
+        </div>
+    </header>
+    
+    <div class="hero">
+        <div class="hero-content">
+            <h1>第25回 ソフトボール大会</h1>
+            <p class="hero-subtitle">2025年12月7日（日）開催</p>
+        </div>
     </div>
     
-    <div class="tabs" id="tabs"></div>
-    
-    <div class="content" id="content">
-        <div class="loading">データを読み込んでいます...</div>
+    <div class="photo-slider-section">
+        <div class="slider-container">
+            <div class="slider-track" id="sliderTrack">
+                <div class="slide placeholder">
+                    📷
+                    <div class="slider-overlay">
+                        <div class="slider-title">フォトギャラリー</div>
+                        <div class="slider-subtitle">クリックして写真を見る</div>
+                    </div>
+                </div>
+            </div>
+            <div class="slider-dots" id="sliderDots"></div>
+        </div>
     </div>
     
-    <div class="quick-links">
-        <button class="link-btn" onclick="openPage('schedule.html')">📅 スケジュール</button>
-        <button class="link-btn" onclick="openPage('tournament.html')">🏆 トーナメント</button>
-        <button class="link-btn" onclick="openPage('rules.html')">📋 大会ルール</button>
-        <button class="link-btn" onclick="openPage('teams.html')">👥 チーム一覧</button>
-        <button class="link-btn" onclick="openPage('venue.html')">📍 会場案内</button>
-        <button class="link-btn" onclick="openPage('history.html')">🥇 優勝記録</button>
+    <div class="container">
+        <h2 class="section-title">試合速報</h2>
+        
+        <div class="tabs" id="tabs"></div>
+        
+        <div id="content">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <div>データを読み込んでいます...</div>
+            </div>
+        </div>
+        
+        <h2 class="section-title" style="margin-top: 60px;">大会情報</h2>
+        
+        <div class="quick-links">
+            <a href="#" onclick="openPage('schedule.html'); return false;" class="link-card">
+                <div class="link-icon">📅</div>
+                <div class="link-title">大会スケジュール</div>
+                <div class="link-description">当日のタイムテーブル</div>
+            </a>
+            
+            <a href="#" onclick="openPage('tournament.html'); return false;" class="link-card">
+                <div class="link-icon">🏆</div>
+                <div class="link-title">トーナメント表</div>
+                <div class="link-description">対戦組み合わせ</div>
+            </a>
+            
+            <a href="#" onclick="openPage('teams.html'); return false;" class="link-card">
+                <div class="link-icon">👥</div>
+                <div class="link-title">チーム一覧</div>
+                <div class="link-description">参加チーム紹介</div>
+            </a>
+            
+            <a href="#" onclick="openPage('rules.html'); return false;" class="link-card">
+                <div class="link-icon">📋</div>
+                <div class="link-title">大会ルール</div>
+                <div class="link-description">競技規則・注意事項</div>
+            </a>
+            
+            <a href="#" onclick="openPage('venue.html'); return false;" class="link-card">
+                <div class="link-icon">📍</div>
+                <div class="link-title">会場案内</div>
+                <div class="link-description">アクセス・施設情報</div>
+            </a>
+            
+            <a href="#" onclick="openPage('history.html'); return false;" class="link-card">
+                <div class="link-icon">🥇</div>
+                <div class="link-title">優勝記録</div>
+                <div class="link-description">歴代優勝チーム</div>
+            </a>
+        </div>
     </div>
     
-    <button class="refresh-btn" id="refreshBtn" onclick="manualRefresh()">🔄</button>
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#" onclick="openPage('schedule.html'); return false;">スケジュール</a>
+                <a href="#" onclick="openPage('tournament.html'); return false;">トーナメント</a>
+                <a href="#" onclick="openPage('teams.html'); return false;">チーム一覧</a>
+                <a href="#" onclick="openPage('rules.html'); return false;">大会ルール</a>
+                <a href="#" onclick="openPage('venue.html'); return false;">会場案内</a>
+                <a href="#" onclick="openPage('history.html'); return false;">優勝記録</a>
+            </div>
+            <div class="copyright">
+                © 2025 Softball Tournament. All rights reserved.
+            </div>
+        </div>
+    </footer>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        
-        // スタッフBOT API（スコアボード用）
         const STAFF_API_URL = urlParams.get('staff_api') || localStorage.getItem('STAFF_BOT_API_URL') || '';
-        
-        // 観客BOT API（写真ギャラリー用）
         const AUDIENCE_API_URL = urlParams.get('audience_api') || localStorage.getItem('AUDIENCE_BOT_API_URL') || '';
         
-        // URLパラメータがあればlocalStorageに保存
         if (urlParams.get('staff_api')) {
             localStorage.setItem('STAFF_BOT_API_URL', urlParams.get('staff_api'));
         }
         if (urlParams.get('audience_api')) {
             localStorage.setItem('AUDIENCE_BOT_API_URL', urlParams.get('audience_api'));
         }
-        
-        // 下位互換性: 旧パラメータ 'api' もスタッフAPIとして扱う
         if (urlParams.get('api')) {
             localStorage.setItem('STAFF_BOT_API_URL', urlParams.get('api'));
         }
         
-        if (!STAFF_API_URL) {
-            document.getElementById('content').innerHTML = `
-                <div class="no-games">
-                    <h2>⚠️ API URLが設定されていません</h2>
-                    <p style="margin-top:15px;">URLパラメータで以下を指定してください:</p>
-                    <p style="margin-top:10px;font-size:0.9em;">?staff_api=スタッフBOT_URL&audience_api=観客BOT_URL</p>
-                </div>
-            `;
-        }
-        
-        let isRefreshing = false;
         let currentCourt = null;
         let gamesData = null;
         let currentSlide = 0;
         let sliderInterval = null;
-        let galleryPhotos = [];
         
-        function initSlider() {
+        function initSlider(photoCount = 1) {
             const dots = document.getElementById('sliderDots');
-            const slides = document.querySelectorAll('.slide');
-            
             dots.innerHTML = '';
-            slides.forEach((_, index) => {
-                const dot = document.createElement('div');
-                dot.className = `dot ${index === 0 ? 'active' : ''}`;
-                dots.appendChild(dot);
-            });
             
-            // スライド間隔を3秒から5秒に変更
-            if (sliderInterval) {
-                clearInterval(sliderInterval);
+            for (let i = 0; i < photoCount; i++) {
+                const dot = document.createElement('div');
+                dot.className = `dot ${i === 0 ? 'active' : ''}`;
+                dot.onclick = () => goToSlide(i);
+                dots.appendChild(dot);
             }
+            
+            if (sliderInterval) clearInterval(sliderInterval);
             sliderInterval = setInterval(nextSlide, 5000);
         }
         
@@ -458,12 +638,22 @@
             });
         }
         
+        function goToSlide(index) {
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.dot');
+            
+            currentSlide = index;
+            
+            document.getElementById('sliderTrack').style.transform = 
+                `translateX(-${currentSlide * 100}%)`;
+            
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+            });
+        }
+        
         async function fetchGalleryPhotos() {
-            if (!AUDIENCE_API_URL) {
-                console.log('観客BOT APIが設定されていません');
-                document.getElementById('galleryNote').textContent = '※ ギャラリーAPIが未設定です';
-                return;
-            }
+            if (!AUDIENCE_API_URL) return;
             
             try {
                 const timestamp = new Date().getTime();
@@ -473,21 +663,15 @@
                     cache: 'no-cache'
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) return;
                 
                 const data = await response.json();
                 
                 if (data.photos && data.photos.length > 0) {
-                    galleryPhotos = data.photos;
                     updateGallerySlider(data.photos);
-                } else {
-                    document.getElementById('galleryNote').textContent = '※ まだ写真が投稿されていません';
                 }
             } catch (error) {
                 console.error('ギャラリー写真取得エラー:', error);
-                document.getElementById('galleryNote').textContent = '※ 写真の読み込みに失敗しました';
             }
         }
         
@@ -500,44 +684,33 @@
             photosToShow.forEach(photo => {
                 const slide = document.createElement('div');
                 slide.className = 'slide';
+                slide.style.cursor = 'pointer';
+                slide.onclick = openGallery;
                 
                 const img = document.createElement('img');
                 img.src = photo.thumbnail;
                 img.alt = '大会写真';
                 img.loading = 'eager';
                 
-                // 画像読み込み失敗時の処理
                 img.onerror = function() {
-                    console.error('画像読み込み失敗:', photo.thumbnail);
-                    // 親要素（slide）をプレースホルダーに変更
                     slide.innerHTML = '📷';
                     slide.classList.add('placeholder');
                 };
                 
-                // 画像読み込み成功時の処理
-                img.onload = function() {
-                    console.log('画像読み込み成功:', photo.thumbnail);
-                };
-                
                 slide.appendChild(img);
+                
+                const overlay = document.createElement('div');
+                overlay.className = 'slider-overlay';
+                overlay.innerHTML = `
+                    <div class="slider-title">${photo.userName || '投稿者'}さんの投稿</div>
+                    <div class="slider-subtitle">${photo.timestamp}</div>
+                `;
+                slide.appendChild(overlay);
+                
                 sliderTrack.appendChild(slide);
             });
             
-            // 残りのスロットをプレースホルダーで埋める
-            const remainingSlots = 5 - photosToShow.length;
-            for (let i = 0; i < remainingSlots; i++) {
-                const slide = document.createElement('div');
-                slide.className = 'slide placeholder';
-                const icons = ['📷', '🏆', '⚾', '🎯', '🥇'];
-                slide.textContent = icons[photosToShow.length + i];
-                sliderTrack.appendChild(slide);
-            }
-            
-            // スライダー再初期化
-            initSlider();
-            
-            document.getElementById('galleryNote').textContent = 
-                `※ ${photos.length}枚の写真が投稿されています`;
+            initSlider(photosToShow.length);
         }
         
         function openGallery() {
@@ -553,7 +726,14 @@
         }
         
         async function fetchScores() {
-            if (!STAFF_API_URL) return;
+            if (!STAFF_API_URL) {
+                document.getElementById('content').innerHTML = `
+                    <div class="loading">
+                        <div>⚠️ API URLが設定されていません</div>
+                    </div>
+                `;
+                return;
+            }
             
             try {
                 const timestamp = new Date().getTime();
@@ -575,30 +755,21 @@
                     `最終更新: ${data.lastUpdate}`;
             } catch (error) {
                 console.error('データ取得エラー:', error);
-                document.getElementById('content').innerHTML = 
-                    `<div class="no-games">データの読み込みに失敗しました</div>`;
+                document.getElementById('content').innerHTML = `
+                    <div class="loading">
+                        <div>データの読み込みに失敗しました</div>
+                    </div>
+                `;
             }
-        }
-        
-        async function manualRefresh() {
-            if (isRefreshing) return;
-            
-            isRefreshing = true;
-            const btn = document.getElementById('refreshBtn');
-            btn.disabled = true;
-            
-            await fetchScores();
-            
-            setTimeout(() => {
-                isRefreshing = false;
-                btn.disabled = false;
-            }, 2000);
         }
         
         function displayGames(data) {
             if (!data.games || data.games.length === 0) {
-                document.getElementById('content').innerHTML = 
-                    '<div class="no-games">まだ試合データがありません</div>';
+                document.getElementById('content').innerHTML = `
+                    <div class="loading">
+                        <div>まだ試合データがありません</div>
+                    </div>
+                `;
                 return;
             }
             
@@ -630,6 +801,7 @@
             courts.forEach(court => {
                 const activeClass = court === currentCourt ? 'active' : '';
                 contentHtml += `<div class="court-content ${activeClass}" id="court-${court}">`;
+                contentHtml += '<div class="games-grid">';
                 
                 const games = courtGroups[court];
                 const gameNums = Object.keys(games).sort((a, b) => a - b);
@@ -654,22 +826,21 @@
                                 <span class="status ${statusClass}">${status}</span>
                             </div>
                             <div class="matchup">
-                                <div class="team home">${homeTeam.team}</div>
-                                <div class="score-display">
-                                    <div class="scores">
-                                        <span>${homeTeam.total || 0}</span>
-                                        <span class="score-separator">-</span>
-                                        <span>${awayTeam.total || 0}</span>
-                                    </div>
-                                    ${currentInning ? `<div class="inning-info">${currentInning}</div>` : ''}
+                                <div class="team-row">
+                                    <span class="team-name">${homeTeam.team}</span>
+                                    <span class="team-score">${homeTeam.total || 0}</span>
                                 </div>
-                                <div class="team away">${awayTeam.team}</div>
+                                <div class="team-row">
+                                    <span class="team-name">${awayTeam.team}</span>
+                                    <span class="team-score">${awayTeam.total || 0}</span>
+                                </div>
                             </div>
+                            ${currentInning ? `<div class="inning-info">${currentInning}</div>` : ''}
                         </div>
                     `;
                 });
                 
-                contentHtml += '</div>';
+                contentHtml += '</div></div>';
             });
             
             document.getElementById('content').innerHTML = contentHtml;
@@ -715,7 +886,7 @@
         fetchGalleryPhotos();
         setInterval(fetchScores, 60000);
         setInterval(fetchGalleryPhotos, 60000);
-        initSlider();
+        initSlider(1);
     </script>
 </body>
 </html>
