@@ -648,7 +648,7 @@
             const match2 = matches[2];
             const winner2 = determineWinner(match2);
             const schedule2 = scheduleData[2];
-            html += renderMatchCard(match2, 2, 'line-bracket-bottom', winner2 !== null, schedule2);
+            html += renderMatchCard(match2, 2, 'line-bracket-top', winner2 !== null, schedule2);
             
             // シードカード（下側のペアの下）
             if (seedTeam) {
@@ -660,7 +660,7 @@
                         <div class="seed-info">
                             <span class="seed-icon">⭐</span>${seedTeam}
                         </div>
-                        <div class="line-bracket-top active"></div>
+                        <div class="line-bracket-bottom active"></div>
                     </div>
                 `;
             }
@@ -693,7 +693,7 @@
             const match5 = matches[5];
             const winner5 = determineWinner(match5);
             const schedule5 = scheduleData[5];
-            html += renderMatchCard(match5, 5, 'line-bracket-top', winner5 !== null, schedule5);
+            html += renderMatchCard(match5, 5, 'line-bracket-bottom', winner5 !== null, schedule5);
             
             html += `
                             </div>
