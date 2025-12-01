@@ -526,12 +526,22 @@
         
         function formatTime(timeValue) {
             if (typeof timeValue === 'number') {
+                // Excelのシリアル値を時刻に変換（0.5 = 12:00）
                 const totalMinutes = Math.round(timeValue * 24 * 60);
                 const hours = Math.floor(totalMinutes / 60);
                 const minutes = totalMinutes % 60;
                 return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
             }
-            return timeValue || '';
+            // 既に文字列の場合
+            if (typeof timeValue === 'string') {
+                // "HH:MM" 形式かチェック
+                if (/^\d{1,2}:\d{2}$/.test(timeValue)) {
+                    const [h, m] = timeValue.split(':');
+                    return `${String(h).padStart(2, '0')}:${m}`;
+                }
+                return timeValue;
+            }
+            return '';
         }
         
         function getSeedTeam(games) {
