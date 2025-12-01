@@ -541,8 +541,10 @@
                 if (timeValue.includes('T')) {
                     try {
                         const date = new Date(timeValue);
-                        const hours = date.getUTCHours();
-                        const minutes = date.getUTCMinutes();
+                        // JSTに変換（UTC+9時間）
+                        const jstDate = new Date(date.getTime() + (9 * 60 * 60 * 1000));
+                        const hours = jstDate.getUTCHours();
+                        const minutes = jstDate.getUTCMinutes();
                         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
                     } catch (e) {
                         console.error('時刻パースエラー:', e);
