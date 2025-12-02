@@ -463,10 +463,23 @@
                 width: 100%;
                 justify-content: flex-start;
                 padding-bottom: 5px;
+                /* --- ここから追記/修正 --- */
+                overflow-x: auto; /* 横スクロールを可能にする */
+                -webkit-overflow-scrolling: touch; /* iOSで滑らかなスクロールを可能にする */
+                flex-wrap: nowrap; /* 項目が折り返さないように強制する */
             }
             
             .nav-links a {
-                white-space: nowrap;
+                /* white-space: nowrap; */
+            }
+
+            /* ヘッダーナビゲーションのスクロールバー非表示（任意） */
+            .nav-links::-webkit-scrollbar {
+                display: none; /* Chrome, Safari */
+            }
+            .nav-links {
+                -ms-overflow-style: none; /* IE and Edge */
+                scrollbar-width: none; /* Firefox */
             }
             
             .hero h1 {
