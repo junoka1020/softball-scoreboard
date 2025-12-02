@@ -442,7 +442,10 @@
         /* レスポンシブ */
         @media (max-width: 768px) {
             .header-main {
-                flex-wrap: wrap;
+                flex-wrap: wrap; /* 既存 */
+                /* ★重要★ ここで position: relative; と overflow: hidden; を設定します */
+                position: relative;
+                overflow: hidden; /* .nav-links が溢れるのを防ぎ、グラデーションを効かせる */
             }
             
             .logo {
@@ -463,23 +466,35 @@
                 width: 100%;
                 justify-content: flex-start;
                 padding-bottom: 5px;
-                /* --- ここから追記/修正 --- */
-                overflow-x: auto; /* 横スクロールを可能にする */
-                -webkit-overflow-scrolling: touch; /* iOSで滑らかなスクロールを可能にする */
-                flex-wrap: nowrap; /* 項目が折り返さないように強制する */
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                flex-wrap: nowrap;
+                /* ★重要★ スクロールする要素には擬似要素を付けません */
             }
             
             .nav-links a {
                 white-space: nowrap;
+                flex-shrink: 0; /* リンクが縮まないように念のため追加 */
             }
-
-            /* ヘッダーナビゲーションのスクロールバー非表示（任意） */
-            .nav-links::-webkit-scrollbar {
-                display: none; /* Chrome, Safari */
-            }
-            .nav-links {
-                -ms-overflow-style: none; /* IE and Edge */
-                scrollbar-width: none; /* Firefox */
+        
+            /* ------------------------------------------- */
+            /* ★グラデーションの設定 (.header-main::after に変更) */
+            /* ------------------------------------------- */
+            .header-main::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 30px; 
+                /* header-main に position: relative; を設定したため top/right: 0 で配置できます */
+                
+                /* .header-main の高さに合わせて調整してください */
+                /* nav-links の高さ（約47px）に合わせて、グラデーションがナビゲーション部分だけを覆うようにします */
+                height: 47px; 
+                
+                /* ヘッダーの色 #003366 に合わせる */
+                background: linear-gradient(to left, #003366, rgba(0, 51, 102, 0)); 
+                z-index: 5;
             }
             
             .hero h1 {
@@ -507,31 +522,6 @@
                 flex-direction: column;
                 gap: 15px;
             }
-
-            /* ナビゲーションコンテナの親要素に設定 */
-            .header-main {
-                /* 擬似要素がこの要素を基準に配置されるようにする */
-                position: relative; 
-                /* 横スクロールする .nav-links が溢れないように hidden にする */
-                overflow: hidden; 
-            }
-            
-            /* スクロールを促すためのグラデーションを右端に配置 */
-            .nav-links::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                /* 右端に配置し、少しの幅を持たせる */
-                right: 0;
-                width: 30px; /* グラデーションの幅 */
-                height: 100%;
-                /* 背景色（#003366）に合わせて透明から不透明なグラデーションを設定 */
-                background: linear-gradient(to left, #003366, rgba(0, 51, 102, 0)); 
-                /* スクロールバーよりも手前に配置 */
-                z-index: 5; 
-                /* .nav-links の高さに合わせる */
-                height: 47px; /* header-main の高さに合わせて調整してください */
-            }    
             
         }
     </style>
