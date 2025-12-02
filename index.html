@@ -441,112 +441,112 @@
         
         /* レスポンシブ */
         @media (max-width: 768px) {
-    /* ------------------------------------------------ */
-    /* ヘッダー構造とグラデーションの基点設定 */
-    /* ------------------------------------------------ */
-    .header-main {
-        flex-wrap: wrap; 
-        /* グラデーション（::after）の配置基準にする */
-        position: relative;
-        /* ナビゲーション以外のコンテンツが親要素の外に表示されないようにする */
-        overflow: hidden; 
-    }
-    
-    .logo {
-        width: 100%;
-        text-align: center;
-        margin-bottom: 10px;
-    }
-    
-    .event-info {
-        order: -1;
-        width: 100%;
-        text-align: center;
-        font-size: 0.85em;
-        margin-bottom: 10px;
-    }
-
-    /* ------------------------------------------------ */
-    /* ナビゲーションの横スクロールと折り返し防止 */
-    /* ------------------------------------------------ */
-    .nav-links {
-        width: 100%;
-        justify-content: flex-start;
-        padding-bottom: 5px;
-        /* 横スクロールを可能にする */
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        /* 項目が折り返さないように強制する */
-        flex-wrap: nowrap;
-        /* スクロールバーを非表示にする（任意） */
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
-    }
-    
-    .nav-links::-webkit-scrollbar {
-        display: none; /* Chrome, Safari */
-    }
-    
-    .nav-links a {
-        /* テキストの折り返しを防ぐ */
-        white-space: nowrap;
-        /* リンクが縮まないように念のため指定 */
-        flex-shrink: 0; 
-    }
-
-    /* ------------------------------------------------ */
-    /* スクロール可能であることを示すグラデーション (フェードアウト) */
-    /* ------------------------------------------------ */
-    .header-main::after {
-        content: '';
-        position: absolute;
-        right: 0;
-        width: 30px; 
-        /* * 【★最重要修正点★】
-         * ロゴとイベント情報の下（= .nav-linksの開始位置）に合わせる必要があります。
-         * ロゴとイベント情報の合計高さを考慮し、ここでは暫定的に 70px とします。
-         * （正確な高さに応じてこの値を調整してください）
-         */
-        top: 70px; 
+            /* ------------------------------------------------ */
+            /* ヘッダー構造とグラデーションの基点設定 */
+            /* ------------------------------------------------ */
+            .header-main {
+                flex-wrap: wrap; 
+                /* グラデーション（::after）の配置基準にする */
+                position: relative;
+                /* ナビゲーション以外のコンテンツが親要素の外に表示されないようにする */
+                overflow: hidden; 
+            }
+            
+            .logo {
+                width: 100%;
+                text-align: center;
+                margin-bottom: 10px;
+            }
+            
+            .event-info {
+                order: -1;
+                width: 100%;
+                text-align: center;
+                font-size: 0.85em;
+                margin-bottom: 10px;
+            }
         
-        /* .nav-links の高さ（padding込みで約47px）に合わせて高さを指定 */
-        height: 47px; 
+            /* ------------------------------------------------ */
+            /* ナビゲーションの横スクロールと折り返し防止 */
+            /* ------------------------------------------------ */
+            .nav-links {
+                width: 100%;
+                justify-content: flex-start;
+                padding-bottom: 5px;
+                /* 横スクロールを可能にする */
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                /* 項目が折り返さないように強制する */
+                flex-wrap: nowrap;
+                /* スクロールバーを非表示にする（任意） */
+                -ms-overflow-style: none; /* IE and Edge */
+                scrollbar-width: none; /* Firefox */
+            }
+            
+            .nav-links::-webkit-scrollbar {
+                display: none; /* Chrome, Safari */
+            }
+            
+            .nav-links a {
+                /* テキストの折り返しを防ぐ */
+                white-space: nowrap;
+                /* リンクが縮まないように念のため指定 */
+                flex-shrink: 0; 
+            }
         
-        /* ヘッダーの背景色 #003366 に合わせたグラデーション */
-        background: linear-gradient(to left, #003366, rgba(0, 51, 102, 0)); 
-        z-index: 5;
-        /* ナビゲーションがスクロールしていてもグラデーションは画面右端に固定されます */
-    }
-    
-    /* ------------------------------------------------ */
-    /* その他のレスポンシブ設定 (既存のコードに基づき保持) */
-    /* ------------------------------------------------ */
-    .hero h1 {
-        font-size: 1.8em;
-    }
-    
-    .slider-container {
-        height: 250px;
-    }
-    
-    .tabs {
-        overflow-x: auto;
-    }
-    
-    .tab {
-        padding: 12px 20px;
-        white-space: nowrap;
-    }
-    
-    .games-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .footer-links {
-        flex-direction: column;
-        gap: 15px;
-    }
-}
+            /* ------------------------------------------------ */
+            /* スクロール可能であることを示すグラデーション (フェードアウト) */
+            /* ------------------------------------------------ */
+            .header-main::after {
+                content: '';
+                position: absolute;
+                right: 0;
+                width: 30px; 
+                /* * 【★最重要修正点★】
+                 * ロゴとイベント情報の下（= .nav-linksの開始位置）に合わせる必要があります。
+                 * ロゴとイベント情報の合計高さを考慮し、ここでは暫定的に 70px とします。
+                 * （正確な高さに応じてこの値を調整してください）
+                 */
+                top: 200px; 
+                
+                /* .nav-links の高さ（padding込みで約47px）に合わせて高さを指定 */
+                height: 47px; 
+                
+                /* ヘッダーの背景色 #003366 に合わせたグラデーション */
+                background: linear-gradient(to left, #003366, rgba(0, 51, 102, 0)); 
+                z-index: 5;
+                /* ナビゲーションがスクロールしていてもグラデーションは画面右端に固定されます */
+            }
+            
+            /* ------------------------------------------------ */
+            /* その他のレスポンシブ設定 (既存のコードに基づき保持) */
+            /* ------------------------------------------------ */
+            .hero h1 {
+                font-size: 1.8em;
+            }
+            
+            .slider-container {
+                height: 250px;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+            }
+            
+            .tab {
+                padding: 12px 20px;
+                white-space: nowrap;
+            }
+            
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
     </style>
 </head>
 <body>
