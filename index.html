@@ -9,11 +9,6 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            
-            .footer-links {
-                flex-direction: column;
-                gap: 15px;
-            }
         }
         
         body {
@@ -71,20 +66,19 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            font-size: 1.5em;
-            font-weight: bold;
-            letter-spacing: 1px;
         }
         
         .nav-links {
             display: flex;
             gap: 25px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: 5px;
+        }
+        
+        .nav-links::-webkit-scrollbar {
+            display: none;
         }
         
         .nav-links a {
@@ -92,13 +86,14 @@
             text-decoration: none;
             font-size: 0.95em;
             transition: opacity 0.3s;
+            white-space: nowrap;
         }
         
         .nav-links a:hover {
             opacity: 0.7;
         }
         
-        /* メインビジュアル */
+        /* ヒーローエリア */
         .hero {
             background: linear-gradient(to right, #003366, #005599);
             color: white;
@@ -118,9 +113,19 @@
             letter-spacing: 2px;
         }
         
-        .hero-subtitle {
+        .hero-info {
             font-size: 1.2em;
             opacity: 0.9;
+            margin-top: 10px;
+        }
+        
+        .hero-date {
+            font-size: 1.3em;
+            margin-bottom: 8px;
+        }
+        
+        .hero-venue {
+            font-size: 1.1em;
         }
         
         /* 写真スライダー */
@@ -324,29 +329,40 @@
             padding: 20px 15px;
         }
         
-        .team-row {
+        .matchup-line {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .team-row:last-child {
-            border-bottom: none;
+            gap: 15px;
         }
         
         .team-name {
             font-size: 1.1em;
             font-weight: 500;
+            flex: 1;
+        }
+        
+        .team-name.home {
+            text-align: left;
+        }
+        
+        .team-name.away {
+            text-align: right;
+        }
+        
+        .score-separator {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #003366;
+            padding: 0 10px;
         }
         
         .team-score {
             font-size: 1.8em;
             font-weight: bold;
             color: #003366;
-            min-width: 50px;
-            text-align: right;
+            min-width: 40px;
+            text-align: center;
         }
         
         .inning-info {
@@ -439,38 +455,17 @@
             100% { transform: rotate(360deg); }
         }
         
+        .scroll-indicator {
+            display: none;
+        }
+        
         /* レスポンシブ */
         @media (max-width: 768px) {
-            /* ------------------------------------------------ */
-            /* ヘッダー構造と矢印の基点設定 */
-            /* ------------------------------------------------ */
             .header-main {
-                /* nav-linksの上に.logoや.event-infoがあればここで縦積みになる想定だが、
-                   HTMLに無いのでナビゲーションが最上部にくる */
-                flex-wrap: wrap; 
                 position: relative;
-                overflow: hidden; 
+                overflow: hidden;
             }
             
-            /* 実際にはHTMLに無いが、CSS定義は保持 */
-            .logo {
-                width: 100%;
-                text-align: center;
-                margin-bottom: 10px;
-            }
-            
-            /* 実際にはHTMLに無いが、CSS定義は保持 */
-            .event-info {
-                order: -1;
-                width: 100%;
-                text-align: center;
-                font-size: 0.85em;
-                margin-bottom: 10px;
-            }
-        
-            /* ------------------------------------------------ */
-            /* ナビゲーションの横スクロールと折り返し防止 */
-            /* ------------------------------------------------ */
             .nav-links {
                 width: 100%;
                 justify-content: flex-start;
@@ -478,45 +473,28 @@
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
                 flex-wrap: nowrap;
-                -ms-overflow-style: none;
-                scrollbar-width: none;
-            }
-            
-            .nav-links::-webkit-scrollbar {
-                display: none; 
             }
             
             .nav-links a {
-                white-space: nowrap;
-                flex-shrink: 0; 
+                flex-shrink: 0;
             }
-        
-            /* ------------------------------------------------ */
-            /* ★スクロール矢印アイコンの設定 (.scroll-indicator) - top値を修正 */
-            /* ------------------------------------------------ */
+            
             .scroll-indicator {
+                display: flex;
                 position: absolute;
                 right: 0;
-                /* 【修正】ロゴとイベント情報がないため、.header-main の padding-top (15px) に合わせる */
-                top: 15px; 
-                
-                height: 47px; /* .nav-links の高さ（padding込み）に合わせる */
-                width: 30px; 
-                
-                display: flex;
+                top: 15px;
+                height: 47px;
+                width: 30px;
                 align-items: center;
                 justify-content: center;
-                
                 font-size: 1.2em;
-                color: white; 
-                background-color: #003366; 
-                cursor: pointer; 
+                color: white;
+                background-color: #003366;
+                cursor: pointer;
                 z-index: 10;
             }
-        
-            /* ------------------------------------------------ */
-            /* その他のレスポンシブ設定 (既存のコードに基づき保持) */
-            /* ------------------------------------------------ */
+            
             .hero h1 {
                 font-size: 1.8em;
             }
@@ -537,11 +515,6 @@
             .games-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .footer-links {
-                flex-direction: column;
-                gap: 15px;
-            }
         }
     </style>
 </head>
@@ -559,15 +532,27 @@
         </div>
         <div class="header-main">
             <nav class="nav-links">
-                <a href="#" onclick="openPage('schedule.html'); return false;">スケジュール</a>
-                <a href="#" onclick="openPage('tournament.html'); return false;">トーナメント</a>
-                <a href="#" onclick="openPage('teams.html'); return false;">チーム</a>
-                <a href="#" onclick="openPage('rules.html'); return false;">ルール</a>
-                <a href="#" onclick="openPage('venue.html'); return false;">会場案内</a>
+                <a href="#scores">試合速報 / 試合結果</a>
+                <a href="#" onclick="openPage('schedule.html'); return false;">大会スケジュール</a>
+                <a href="#" onclick="openPage('tournament.html'); return false;">トーナメント表</a>
+                <a href="#" onclick="openPage('teams.html'); return false;">チーム・選手一覧</a>
+                <a href="#" onclick="openPage('venue.html'); return false;">会場案内・アクセス</a>
+                <a href="#" onclick="openPage('rules.html'); return false;">大会ルール・規約</a>
+                <a href="#" onclick="openPage('history.html'); return false;">優勝記録・歴史</a>
             </nav>
             <div class="scroll-indicator">▶︎</div>
         </div>
     </header>
+    
+    <div class="hero">
+        <div class="hero-content">
+            <h1>第25回 ソフトボール大会</h1>
+            <div class="hero-info">
+                <div class="hero-date">2025年12月7日（日）開催</div>
+                <div class="hero-venue">📍 〇〇市総合運動公園 ソフトボール場</div>
+            </div>
+        </div>
+    </div>
     
     <div class="photo-slider-section">
         <div class="slider-container">
@@ -585,7 +570,7 @@
     </div>
     
     <div class="container">
-        <h2 class="section-title">試合速報</h2>
+        <h2 class="section-title" id="scores">試合速報</h2>
         
         <div class="tabs" id="tabs"></div>
         
@@ -650,7 +635,6 @@
         function formatTimestamp(timestamp) {
             if (!timestamp) return '';
             
-            // ISO形式の場合
             if (timestamp.includes('T') && timestamp.includes('Z')) {
                 const date = new Date(timestamp);
                 const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -660,12 +644,10 @@
                 return `${month}/${day} ${hours}:${minutes}`;
             }
             
-            // "MM/dd HH:mm" 形式の場合はそのまま返す
             if (timestamp.match(/^\d{2}\/\d{2}\s+\d{2}:\d{2}$/)) {
                 return timestamp;
             }
             
-            // それ以外の場合はそのまま返す
             return timestamp;
         }
         
@@ -781,7 +763,6 @@
                 const overlay = document.createElement('div');
                 overlay.className = 'slider-overlay';
                 
-                // 日時をフォーマット
                 const timestamp = formatTimestamp(photo.timestamp);
                 
                 overlay.innerHTML = `
@@ -833,9 +814,6 @@
                 const data = await response.json();
                 gamesData = data;
                 displayGames(data);
-                
-                document.getElementById('updateTime').textContent = 
-                    `最終更新: ${data.lastUpdate}`;
             } catch (error) {
                 console.error('データ取得エラー:', error);
                 document.getElementById('content').innerHTML = `
@@ -909,13 +887,12 @@
                                 <span class="status ${statusClass}">${status}</span>
                             </div>
                             <div class="matchup">
-                                <div class="team-row">
-                                    <span class="team-name">${homeTeam.team}</span>
+                                <div class="matchup-line">
+                                    <span class="team-name home">${homeTeam.team}</span>
                                     <span class="team-score">${homeTeam.total || 0}</span>
-                                </div>
-                                <div class="team-row">
-                                    <span class="team-name">${awayTeam.team}</span>
+                                    <span class="score-separator">-</span>
                                     <span class="team-score">${awayTeam.total || 0}</span>
+                                    <span class="team-name away">${awayTeam.team}</span>
                                 </div>
                             </div>
                             ${currentInning ? `<div class="inning-info">${currentInning}</div>` : ''}
