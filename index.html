@@ -9,6 +9,11 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 15px;
+            }
         }
         
         body {
@@ -397,33 +402,14 @@
         footer {
             background: #002244;
             color: white;
-            padding: 40px 20px;
+            padding: 20px;
             margin-top: 60px;
+            text-align: center;
         }
         
         .footer-content {
             max-width: 1200px;
             margin: 0 auto;
-            text-align: center;
-        }
-        
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 20px;
-        }
-        
-        .footer-links a {
-            color: white;
-            text-decoration: none;
-            font-size: 0.9em;
-            opacity: 0.8;
-            transition: opacity 0.3s;
-        }
-        
-        .footer-links a:hover {
-            opacity: 1;
         }
         
         .copyright {
@@ -456,14 +442,31 @@
         /* レスポンシブ */
         @media (max-width: 768px) {
             .header-main {
-                flex-direction: column;
-                gap: 15px;
+                flex-wrap: wrap;
+            }
+            
+            .logo {
+                width: 100%;
+                text-align: center;
+                margin-bottom: 10px;
+            }
+            
+            .event-info {
+                order: -1;
+                width: 100%;
+                text-align: center;
+                font-size: 0.85em;
+                margin-bottom: 10px;
             }
             
             .nav-links {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 15px;
+                width: 100%;
+                justify-content: flex-start;
+                padding-bottom: 5px;
+            }
+            
+            .nav-links a {
+                white-space: nowrap;
             }
             
             .hero h1 {
@@ -508,6 +511,7 @@
         </div>
         <div class="header-main">
             <div class="logo">⚾ SOFTBALL TOURNAMENT</div>
+            <div class="event-info">第25回大会 | 2025.12.7開催</div>
             <nav class="nav-links">
                 <a href="#" onclick="openPage('schedule.html'); return false;">スケジュール</a>
                 <a href="#" onclick="openPage('tournament.html'); return false;">トーナメント</a>
@@ -517,13 +521,6 @@
             </nav>
         </div>
     </header>
-    
-    <div class="hero">
-        <div class="hero-content">
-            <h1>第25回 ソフトボール大会</h1>
-            <p class="hero-subtitle">2025年12月7日（日）開催</p>
-        </div>
-    </div>
     
     <div class="photo-slider-section">
         <div class="slider-container">
@@ -595,14 +592,6 @@
     
     <footer>
         <div class="footer-content">
-            <div class="footer-links">
-                <a href="#" onclick="openPage('schedule.html'); return false;">スケジュール</a>
-                <a href="#" onclick="openPage('tournament.html'); return false;">トーナメント</a>
-                <a href="#" onclick="openPage('teams.html'); return false;">チーム一覧</a>
-                <a href="#" onclick="openPage('rules.html'); return false;">大会ルール</a>
-                <a href="#" onclick="openPage('venue.html'); return false;">会場案内</a>
-                <a href="#" onclick="openPage('history.html'); return false;">優勝記録</a>
-            </div>
             <div class="copyright">
                 © 2025 Softball Tournament. All rights reserved.
             </div>
@@ -610,6 +599,29 @@
     </footer>
 
     <script>
+        // 日時フォーマット関数
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return '';
+            
+            // ISO形式の場合
+            if (timestamp.includes('T') && timestamp.includes('Z')) {
+                const date = new Date(timestamp);
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                return `${month}/${day} ${hours}:${minutes}`;
+            }
+            
+            // "MM/dd HH:mm" 形式の場合はそのまま返す
+            if (timestamp.match(/^\d{2}\/\d{2}\s+\d{2}:\d{2}$/)) {
+                return timestamp;
+            }
+            
+            // それ以外の場合はそのまま返す
+            return timestamp;
+        }
+        
         const urlParams = new URLSearchParams(window.location.search);
         const STAFF_API_URL = urlParams.get('staff_api') || localStorage.getItem('STAFF_BOT_API_URL') || '';
         const AUDIENCE_API_URL = urlParams.get('audience_api') || localStorage.getItem('AUDIENCE_BOT_API_URL') || '';
@@ -721,9 +733,13 @@
                 
                 const overlay = document.createElement('div');
                 overlay.className = 'slider-overlay';
+                
+                // 日時をフォーマット
+                const timestamp = formatTimestamp(photo.timestamp);
+                
                 overlay.innerHTML = `
-                    <div class="slider-title">${photo.userName || '投稿者'}さんの投稿</div>
-                    <div class="slider-subtitle">${photo.timestamp}</div>
+                    <div class="slider-title">大会写真ギャラリー</div>
+                    <div class="slider-subtitle">${timestamp} 投稿</div>
                 `;
                 slide.appendChild(overlay);
                 
