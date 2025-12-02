@@ -507,6 +507,32 @@
                 flex-direction: column;
                 gap: 15px;
             }
+
+            /* ナビゲーションコンテナの親要素に設定 */
+            .header-main {
+                /* 擬似要素がこの要素を基準に配置されるようにする */
+                position: relative; 
+                /* 横スクロールする .nav-links が溢れないように hidden にする */
+                overflow: hidden; 
+            }
+            
+            /* スクロールを促すためのグラデーションを右端に配置 */
+            .nav-links::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                /* 右端に配置し、少しの幅を持たせる */
+                right: 0;
+                width: 30px; /* グラデーションの幅 */
+                height: 100%;
+                /* 背景色（#003366）に合わせて透明から不透明なグラデーションを設定 */
+                background: linear-gradient(to left, #003366, rgba(0, 51, 102, 0)); 
+                /* スクロールバーよりも手前に配置 */
+                z-index: 5; 
+                /* .nav-links の高さに合わせる */
+                height: 47px; /* header-main の高さに合わせて調整してください */
+            }    
+            
         }
     </style>
 </head>
