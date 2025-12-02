@@ -29,7 +29,7 @@
         
         .header-top {
             background: #002244;
-            padding: 8px 0;
+            padding: 12px 0;
             font-size: 0.85em;
         }
         
@@ -42,8 +42,24 @@
             align-items: center;
         }
         
-        .update-time {
+        .header-logo {
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        
+        .header-logo:hover {
+            opacity: 0.8;
+        }
+        
+        .header-logo img {
+            height: 35px;
+            width: auto;
+            display: block;
+        }
+        
+        .header-info {
             color: #aaa;
+            font-size: 0.9em;
         }
         
         .header-main {
@@ -482,8 +498,12 @@
     <header>
         <div class="header-top">
             <div class="header-top-content">
-                <div class="update-time" id="updateTime">読み込み中...</div>
-                <div>2025年度大会</div>
+                <a href="#" onclick="return false;" class="header-logo">
+                    <img src="https://via.placeholder.com/150x35/002244/FFFFFF?text=全国郵便局長会" alt="全国郵便局長会">
+                </a>
+                <div class="header-info">
+                    第25回 ソフトボール大会 | 2025.12.7
+                </div>
             </div>
         </div>
         <div class="header-main">
