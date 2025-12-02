@@ -442,11 +442,11 @@
         /* レスポンシブ */
         @media (max-width: 768px) {
             /* ------------------------------------------------ */
-            /* ヘッダー構造とグラデーションの基点設定 */
+            /* ヘッダー構造と矢印の基点設定 */
             /* ------------------------------------------------ */
             .header-main {
                 flex-wrap: wrap; 
-                /* グラデーション（::after）の配置基準にする */
+                /* 矢印（.scroll-indicator）の配置基準にする */
                 position: relative;
                 /* ナビゲーション以外のコンテンツが親要素の外に表示されないようにする */
                 overflow: hidden; 
@@ -478,13 +478,14 @@
                 -webkit-overflow-scrolling: touch;
                 /* 項目が折り返さないように強制する */
                 flex-wrap: nowrap;
-                /* スクロールバーを非表示にする（任意） */
+                /* スクロールバーを非表示にする */
                 -ms-overflow-style: none; /* IE and Edge */
                 scrollbar-width: none; /* Firefox */
             }
             
+            /* Chrome, Safari 用のスクロールバー非表示 */
             .nav-links::-webkit-scrollbar {
-                display: none; /* Chrome, Safari */
+                display: none; 
             }
             
             .nav-links a {
@@ -495,29 +496,30 @@
             }
         
             /* ------------------------------------------------ */
-            /* スクロール可能であることを示すグラデーション (フェードアウト) */
+            /* ★スクロール矢印アイコンの設定 (.scroll-indicator) */
             /* ------------------------------------------------ */
-            .header-main::after {
-                content: '';
+            .scroll-indicator {
                 position: absolute;
                 right: 0;
+                /* 【重要】トップ位置を .nav-links の開始位置に合わせる必要があります */
+                /* ロゴ(margin含む)とイベント情報(margin含む)の高さに基づいて調整 */
+                top: 70px; /* ★この値を正確な位置に合わせて調整してください★ */
+                
+                height: 47px; /* .nav-links の高さ（padding込み）に合わせる */
                 width: 30px; 
-                /* * 【★最重要修正点★】
-                 * ロゴとイベント情報の下（= .nav-linksの開始位置）に合わせる必要があります。
-                 * ロゴとイベント情報の合計高さを考慮し、ここでは暫定的に 70px とします。
-                 * （正確な高さに応じてこの値を調整してください）
-                 */
-                top: 200px; 
                 
-                /* .nav-links の高さ（padding込みで約47px）に合わせて高さを指定 */
-                height: 47px; 
+                /* 矢印を中央に配置 */
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 
-                /* ヘッダーの背景色 #003366 に合わせたグラデーション */
-                background: linear-gradient(to left, #003366, rgba(0, 51, 102, 0)); 
-                z-index: 5;
-                /* ナビゲーションがスクロールしていてもグラデーションは画面右端に固定されます */
+                font-size: 1.2em;
+                color: white; /* 矢印の色 */
+                background-color: #003366; /* ヘッダーの背景色と同じにする */
+                cursor: pointer; 
+                z-index: 10; /* ナビゲーションの上に表示されるようにする */
             }
-            
+        
             /* ------------------------------------------------ */
             /* その他のレスポンシブ設定 (既存のコードに基づき保持) */
             /* ------------------------------------------------ */
@@ -569,6 +571,7 @@
                 <a href="#" onclick="openPage('rules.html'); return false;">ルール</a>
                 <a href="#" onclick="openPage('venue.html'); return false;">会場案内</a>
             </nav>
+            <div class="scroll-indicator">▶︎</div>
         </div>
     </header>
     
