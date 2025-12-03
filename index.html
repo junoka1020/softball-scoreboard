@@ -483,7 +483,8 @@
                 display: flex;
                 position: absolute;
                 right: 0;
-                top: 15px;
+                top: 50%;
+                transform: translateY(-50%);
                 height: 47px;
                 width: 30px;
                 align-items: center;
@@ -531,8 +532,8 @@
             </div>
         </div>
         <div class="header-main">
-            <nav class="nav-links">
-                <a href="#scores">試合速報 / 試合結果</a>
+            <nav class="nav-links" id="navLinks">
+                <a href="#" onclick="openPage('all-scores.html'); return false;">試合速報 / 試合結果</a>
                 <a href="#" onclick="openPage('schedule.html'); return false;">大会スケジュール</a>
                 <a href="#" onclick="openPage('tournament.html'); return false;">トーナメント表</a>
                 <a href="#" onclick="openPage('teams.html'); return false;">チーム・選手一覧</a>
@@ -540,7 +541,7 @@
                 <a href="#" onclick="openPage('rules.html'); return false;">大会ルール・規約</a>
                 <a href="#" onclick="openPage('history.html'); return false;">優勝記録・歴史</a>
             </nav>
-            <div class="scroll-indicator">▶︎</div>
+            <div class="scroll-indicator" id="scrollIndicator">▶︎</div>
         </div>
     </header>
     
@@ -947,6 +948,63 @@
         setInterval(fetchScores, 60000);
         setInterval(fetchGalleryPhotos, 60000);
         initSlider(1);
+        
+        // スクロールインジケーターの制御
+        const navLinks = document.getElementById('navLinks');
+        const scrollIndicator = document.getElementById('scrollIndicator');
+        
+        function updateScrollIndicator() {
+            if (!navLinks || !scrollIndicator) return;
+            
+            const maxScroll = navLinks.scrollWidth - navLinks.clientWidth;
+            const currentScroll = navLinks.scrollLeft;
+            
+            // スクロールが必要ない場合は非表示
+            if (maxScroll <= 0) {
+                scrollIndicator.style.display = 'none';
+                return;
+            }
+            
+            // 右にスクロールできる場合
+            if (currentScroll < maxScroll - 5) {
+                scrollIndicator.style.display = 'flex';
+                scrollIndicator.textContent = '▶︎';
+                scrollIndicator.style.left = 'auto';
+                scrollIndicator.style.right = '0';
+            }
+            // 左にスクロールできる場合
+            else if (currentScroll > 5) {
+                scrollIndicator.style.display = 'flex';
+                scrollIndicator.textContent = '◀︎';
+                scrollIndicator.style.left = '0';
+                scrollIndicator.style.right = 'auto';
+            }
+            // どちらにもスクロールできない場合
+            else {
+                scrollIndicator.style.display = 'none';
+            }
+        }
+        
+        // スクロールイベントを監視
+        if (navLinks) {
+            navLinks.addEventListener('scroll', updateScrollIndicator);
+            window.addEventListener('resize', updateScrollIndicator);
+            
+            // 初期表示
+            updateScrollIndicator();
+        }
+        
+        // インジケータークリックでスクロール
+        if (scrollIndicator) {
+            scrollIndicator.addEventListener('click', () => {
+                const scrollAmount = 200;
+                if (scrollIndicator.textContent === '▶︎') {
+                    navLinks.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                } else {
+                    navLinks.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                }
+            });
+        }
     </script>
 </body>
 </html>
