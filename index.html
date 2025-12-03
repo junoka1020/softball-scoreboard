@@ -479,10 +479,10 @@
                 flex-shrink: 0;
             }
             
+            /* 💡 インジケーターを2つに分割し、左右に固定 */
             .scroll-indicator {
-                display: flex;
+                display: none; /* JSで表示を制御するため、初期は非表示 */
                 position: absolute;
-                right: 0;
                 top: 50%;
                 transform: translateY(-50%);
                 height: 47px;
@@ -494,6 +494,14 @@
                 background-color: #003366;
                 cursor: pointer;
                 z-index: 10;
+            }
+            .scroll-indicator.left {
+                left: 0;
+                right: auto;
+            }
+            .scroll-indicator.right {
+                right: 0;
+                left: auto;
             }
             
             .hero h1 {
@@ -541,7 +549,8 @@
                 <a href="#" onclick="openPage('rules.html'); return false;">大会ルール・規約</a>
                 <a href="#" onclick="openPage('history.html'); return false;">優勝記録・歴史</a>
             </nav>
-            <div class="scroll-indicator" id="scrollIndicator">▶︎</div>
+            <div class="scroll-indicator left" id="scrollIndicatorLeft">◀︎</div>
+            <div class="scroll-indicator right" id="scrollIndicatorRight">▶︎</div>
         </div>
     </header>
     
@@ -972,45 +981,37 @@
         
         // スクロールインジケーターの制御
         const navLinks = document.getElementById('navLinks');
-        const scrollIndicator = document.getElementById('scrollIndicator');
+        // 💡 左右それぞれのインジケーターを取得するように変更
+        const scrollIndicatorLeft = document.getElementById('scrollIndicatorLeft');
+        const scrollIndicatorRight = document.getElementById('scrollIndicatorRight');
         
         function updateScrollIndicator() {
-            if (!navLinks || !scrollIndicator) return;
+            // 💡 IDの変更に対応
+            if (!navLinks || !scrollIndicatorLeft || !scrollIndicatorRight) return;
 
             const maxScroll = navLinks.scrollWidth - navLinks.clientWidth;
             const currentScroll = navLinks.scrollLeft;
             const threshold = 5; // 許容誤差
 
-            // 1. スクロールが必要ない場合
+            // スクロールが必要ない場合は両方非表示
             if (maxScroll <= threshold) {
-                scrollIndicator.style.display = 'none';
+                scrollIndicatorLeft.style.display = 'none';
+                scrollIndicatorRight.style.display = 'none';
                 return;
             }
 
-            // 2. 左端にいる場合（右にスクロールできる）
-            if (currentScroll <= threshold) {
-                scrollIndicator.style.display = 'flex';
-                scrollIndicator.textContent = '▶︎'; // 右に進むことを示す
-                scrollIndicator.style.left = 'auto'; // 右端に配置
-                scrollIndicator.style.right = '0';
+            // 1. 左矢印（◀︎）の制御: 左に戻れるなら表示 (左端から離れている)
+            if (currentScroll > threshold) {
+                scrollIndicatorLeft.style.display = 'flex';
+            } else {
+                scrollIndicatorLeft.style.display = 'none';
             }
-            // 3. 右端にいる場合（左にスクロールできる）
-            else if (currentScroll >= maxScroll - threshold) {
-                scrollIndicator.style.display = 'flex';
-                scrollIndicator.textContent = '◀︎'; // 左に戻ることを示す
-                scrollIndicator.style.left = '0'; // 左端に配置
-                scrollIndicator.style.right = 'auto';
-            }
-            // 4. 途中にいる場合（左右どちらにもスクロールできる）
-            else {
-                // 途中にいる場合は、現在地から左に戻れることを優先して左矢印を表示する（現在のUIの挙動を維持）
-                scrollIndicator.style.display = 'flex';
-                scrollIndicator.textContent = '◀︎';
-                scrollIndicator.style.left = '0'; // 左端に配置
-                scrollIndicator.style.right = 'auto';
-                
-                // 💡 補足: もし途中で右矢印を表示したい場合は、このコードでは対応できません。
-                // その場合は、HTMLでインジケーターを2つ（左右）に分ける必要があります。
+
+            // 2. 右矢印（▶︎）の制御: 右に進めるなら表示 (右端に到達していない)
+            if (currentScroll < maxScroll - threshold) {
+                scrollIndicatorRight.style.display = 'flex';
+            } else {
+                scrollIndicatorRight.style.display = 'none';
             }
         }
         
@@ -1024,14 +1025,17 @@
         }
         
         // インジケータークリックでスクロール
-        if (scrollIndicator) {
-            scrollIndicator.addEventListener('click', () => {
+        if (scrollIndicatorLeft) {
+            scrollIndicatorLeft.addEventListener('click', () => {
                 const scrollAmount = 200;
-                if (scrollIndicator.textContent === '▶︎') {
-                    navLinks.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-                } else {
-                    navLinks.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-                }
+                navLinks.scrollBy({ left: -scrollAmount, behavior: 'smooth' }); // 左にスクロール
+            });
+        }
+        
+        if (scrollIndicatorRight) {
+            scrollIndicatorRight.addEventListener('click', () => {
+                const scrollAmount = 200;
+                navLinks.scrollBy({ left: scrollAmount, behavior: 'smooth' }); // 右にスクロール
             });
         }
     </script>
