@@ -218,6 +218,17 @@
             width: 120px;
             min-width: 120px;
             padding: 12px 15px;
+            position: sticky;
+            left: 0;
+            background: white;
+            z-index: 2;
+        }
+        
+        th.team-header {
+            position: sticky;
+            left: 0;
+            background: #f8f8f8;
+            z-index: 3;
         }
         
         .score-zero {
@@ -238,8 +249,6 @@
             font-weight: bold;
             font-size: 1.4em;
             color: #856404;
-            position: sticky;
-            right: 0;
         }
         
         /* 待機中・試合中メッセージ */
@@ -389,6 +398,10 @@
                 font-size: 0.9em;
             }
             
+            th.team-header {
+                min-width: 80px;
+            }
+            
             .total {
                 font-size: 1.2em;
             }
@@ -454,6 +467,46 @@
         }
         
         let isRefreshing = false;
+        let scheduleData = {};
+        
+        // 時刻フォーマット関数
+        function formatTime(timeValue) {
+            if (!timeValue) return '';
+            
+            // 数値（Excelシリアル値）の場合
+            if (typeof timeValue === 'number') {
+                const totalMinutes = Math.round(timeValue * 24 * 60);
+                const hours = Math.floor(totalMinutes / 60);
+                const minutes = totalMinutes % 60;
+                return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+            }
+            
+            // 文字列の場合
+            if (typeof timeValue === 'string') {
+                // ISO形式の日付文字列
+                if (timeValue.includes('T')) {
+                    try {
+                        const date = new Date(timeValue);
+                        const jstDate = new Date(date.getTime() + (9 * 60 * 60 * 1000));
+                        const hours = jstDate.getUTCHours();
+                        const minutes = jstDate.getUTCMinutes();
+                        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                    } catch (e) {
+                        console.error('時刻パースエラー:', e);
+                    }
+                }
+                
+                // "HH:MM" 形式の場合
+                if (/^\d{1,2}:\d{2}$/.test(timeValue)) {
+                    const [h, m] = timeValue.split(':');
+                    return `${String(h).padStart(2, '0')}:${m}`;
+                }
+                
+                return timeValue;
+            }
+            
+            return '';
+        }
         
         async function fetchScores() {
             try {
@@ -469,6 +522,29 @@
                 }
                 
                 const data = await response.json();
+                
+                // スケジュールデータ取得
+                const scheduleResponse = await fetch(`${API_URL}?type=schedule&t=${timestamp}`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache'
+                });
+                
+                if (scheduleResponse.ok) {
+                    const scheduleJson = await scheduleResponse.json();
+                    if (scheduleJson.schedule) {
+                        scheduleData = scheduleJson.schedule.reduce((acc, s) => {
+                            acc[s.gameNum] = {
+                                court: s.court,
+                                time: s.time,
+                                team1: s.team1,
+                                team2: s.team2
+                            };
+                            return acc;
+                        }, {});
+                    }
+                }
+                
                 displayAllGames(data);
             } catch (error) {
                 console.error('データ取得エラー:', error);
@@ -523,20 +599,31 @@
                 const statusClass = gameData.status === '試合中' ? 'playing' :
                                    gameData.status === '終了' ? 'finished' : 'waiting';
                 
+                // 特別な試合のラベル
+                let specialLabel = '';
+                if (gameData.court === 'B' && gameData.gameNum === 6) {
+                    specialLabel = ' <span style="color: #ffc107;">🥉 3位決定戦</span>';
+                } else if (gameData.court === 'A' && gameData.gameNum === 7) {
+                    specialLabel = ' <span style="color: #ffd700;">🏆 決勝戦</span>';
+                }
+                
                 html += `
                     <div class="game-section">
                         <div class="game-section-header">
-                            <div class="game-title">${gameData.court}コート 第${gameData.gameNum}試合</div>
+                            <div class="game-title">${gameData.court}コート 第${gameData.gameNum}試合${specialLabel}</div>
                             <div class="status-badge ${statusClass}">${gameData.status}</div>
                         </div>
                 `;
                 
                 // 試合前の場合
                 if (gameData.status === '待機' && (!gameData.teams[0].innings || gameData.teams[0].innings.every(s => s === null || s === undefined || s === ''))) {
+                    const schedule = scheduleData[gameData.gameNum];
+                    const startTime = schedule ? formatTime(schedule.time) : '';
+                    
                     html += `
                         <div class="status-message">
                             <div class="status-message-icon">⏰</div>
-                            <div class="status-message-text">まだ試合が始まっていません</div>
+                            <div class="status-message-text">${startTime ? startTime + ' 開始予定' : 'まだ試合が始まっていません'}</div>
                             <div class="status-message-subtext">${gameData.teams[0].team} vs ${gameData.teams[1].team}</div>
                         </div>
                     `;
@@ -552,7 +639,7 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>チーム</th>`;
+                                        <th class="team-header">チーム</th>`;
                     
                     for (let i = 1; i <= inningsCount; i++) {
                         html += `<th>${i}</th>`;
@@ -636,23 +723,25 @@
                 return;
             }
             
-            // 右にスクロールできる場合
-            if (currentScroll < maxScroll - 5) {
-                scrollIndicator.style.display = 'flex';
-                scrollIndicator.textContent = '▶︎';
-                scrollIndicator.style.left = 'auto';
-                scrollIndicator.style.right = '0';
-            }
-            // 左にスクロールできる場合
-            else if (currentScroll > 5) {
-                scrollIndicator.style.display = 'flex';
+            scrollIndicator.style.display = 'flex';
+            
+            // 左にスクロールできる場合（左端にいない場合）
+            if (currentScroll > 5) {
                 scrollIndicator.textContent = '◀︎';
                 scrollIndicator.style.left = '0';
                 scrollIndicator.style.right = 'auto';
             }
-            // どちらにもスクロールできない場合
+            // 右にスクロールできる場合（右端にいない場合）
+            else if (currentScroll < maxScroll - 5) {
+                scrollIndicator.textContent = '▶︎';
+                scrollIndicator.style.left = 'auto';
+                scrollIndicator.style.right = '0';
+            }
+            // 右端に到達した場合
             else {
-                scrollIndicator.style.display = 'none';
+                scrollIndicator.textContent = '◀︎';
+                scrollIndicator.style.left = '0';
+                scrollIndicator.style.right = 'auto';
             }
         }
         
