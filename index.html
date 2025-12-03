@@ -976,33 +976,41 @@
         
         function updateScrollIndicator() {
             if (!navLinks || !scrollIndicator) return;
-            
+
             const maxScroll = navLinks.scrollWidth - navLinks.clientWidth;
             const currentScroll = navLinks.scrollLeft;
-            
-            // スクロールが必要ない場合は非表示
-            if (maxScroll <= 0) {
+            const threshold = 5; // 許容誤差
+
+            // 1. スクロールが必要ない場合
+            if (maxScroll <= threshold) {
                 scrollIndicator.style.display = 'none';
                 return;
             }
-            
-            scrollIndicator.style.display = 'flex';
-            
-            // 左にスクロールできる場合（左端にいない場合）
-            if (currentScroll > 5) {
-                scrollIndicator.textContent = '◀︎';
-                scrollIndicator.style.left = '0';
-                scrollIndicator.style.right = 'auto';
-            }
-            // 右にスクロールできる場合（右端にいない場合）
-            else if (currentScroll < maxScroll - 5) {
-                scrollIndicator.textContent = '▶︎';
-                scrollIndicator.style.left = 'auto';
+
+            // 2. 左端にいる場合（右にスクロールできる）
+            if (currentScroll <= threshold) {
+                scrollIndicator.style.display = 'flex';
+                scrollIndicator.textContent = '▶︎'; // 右に進むことを示す
+                scrollIndicator.style.left = 'auto'; // 右端に配置
                 scrollIndicator.style.right = '0';
             }
-            // 左端にいる＋これ以上右にスクロールできない場合
+            // 3. 右端にいる場合（左にスクロールできる）
+            else if (currentScroll >= maxScroll - threshold) {
+                scrollIndicator.style.display = 'flex';
+                scrollIndicator.textContent = '◀︎'; // 左に戻ることを示す
+                scrollIndicator.style.left = '0'; // 左端に配置
+                scrollIndicator.style.right = 'auto';
+            }
+            // 4. 途中にいる場合（左右どちらにもスクロールできる）
             else {
-                scrollIndicator.style.display = 'none';
+                // 途中にいる場合は、現在地から左に戻れることを優先して左矢印を表示する（現在のUIの挙動を維持）
+                scrollIndicator.style.display = 'flex';
+                scrollIndicator.textContent = '◀︎';
+                scrollIndicator.style.left = '0'; // 左端に配置
+                scrollIndicator.style.right = 'auto';
+                
+                // 💡 補足: もし途中で右矢印を表示したい場合は、このコードでは対応できません。
+                // その場合は、HTMLでインジケーターを2つ（左右）に分ける必要があります。
             }
         }
         
