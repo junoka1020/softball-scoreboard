@@ -66,35 +66,35 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         
-        .back-btn {
-            background: rgba(255,255,255,0.1);
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: 5px;
+        }
+        
+        .nav-links::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .nav-links a {
             color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-            padding: 8px 20px;
-            border-radius: 4px;
-            font-size: 0.95em;
-            cursor: pointer;
-            transition: all 0.3s;
             text-decoration: none;
-            display: inline-block;
+            font-size: 0.95em;
+            transition: opacity 0.3s;
             white-space: nowrap;
         }
         
-        .back-btn:hover {
-            background: rgba(255,255,255,0.2);
+        .nav-links a:hover {
+            opacity: 0.7;
         }
         
-        .logo {
-            font-size: 1.3em;
-            font-weight: bold;
-            letter-spacing: 1px;
-            text-align: center;
-            flex: 1;
+        .scroll-indicator {
+            display: none;
         }
         
         /* メインコンテンツ */
@@ -335,11 +335,38 @@
         /* レスポンシブ */
         @media (max-width: 768px) {
             .header-main {
-                gap: 10px;
+                position: relative;
+                overflow: hidden;
             }
             
-            .logo {
-                font-size: 1.1em;
+            .nav-links {
+                width: 100%;
+                justify-content: flex-start;
+                padding-bottom: 5px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                flex-wrap: nowrap;
+            }
+            
+            .nav-links a {
+                flex-shrink: 0;
+            }
+            
+            .scroll-indicator {
+                display: flex;
+                position: absolute;
+                right: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                height: 47px;
+                width: 30px;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2em;
+                color: white;
+                background-color: #003366;
+                cursor: pointer;
+                z-index: 10;
             }
             
             .page-title {
@@ -381,8 +408,16 @@
             </div>
         </div>
         <div class="header-main">
-            <a href="#" onclick="goBack(); return false;" class="back-btn">← トップに戻る</a>
-            <div class="logo">⚾ SOFTBALL TOURNAMENT</div>
+            <nav class="nav-links" id="navLinks">
+                <a href="#" onclick="openPage('all-scores.html'); return false;">試合速報 / 試合結果</a>
+                <a href="#" onclick="openPage('schedule.html'); return false;">大会スケジュール</a>
+                <a href="#" onclick="openPage('tournament.html'); return false;">トーナメント表</a>
+                <a href="#" onclick="openPage('teams.html'); return false;">チーム・選手一覧</a>
+                <a href="#" onclick="openPage('venue.html'); return false;">会場案内・アクセス</a>
+                <a href="#" onclick="openPage('rules.html'); return false;">大会ルール・規約</a>
+                <a href="#" onclick="openPage('history.html'); return false;">優勝記録・歴史</a>
+            </nav>
+            <div class="scroll-indicator" id="scrollIndicator">▶︎</div>
         </div>
     </header>
     
@@ -576,8 +611,71 @@
             window.location.href = `index.html?${params.toString()}`;
         }
         
+        function openPage(page) {
+            const params = new URLSearchParams();
+            if (API_URL) params.set('api', API_URL);
+            window.location.href = `${page}?${params.toString()}`;
+        }
+        
         fetchScores();
         setInterval(fetchScores, 60000);
+        
+        // スクロールインジケーターの制御
+        const navLinks = document.getElementById('navLinks');
+        const scrollIndicator = document.getElementById('scrollIndicator');
+        
+        function updateScrollIndicator() {
+            if (!navLinks || !scrollIndicator) return;
+            
+            const maxScroll = navLinks.scrollWidth - navLinks.clientWidth;
+            const currentScroll = navLinks.scrollLeft;
+            
+            // スクロールが必要ない場合は非表示
+            if (maxScroll <= 0) {
+                scrollIndicator.style.display = 'none';
+                return;
+            }
+            
+            // 右にスクロールできる場合
+            if (currentScroll < maxScroll - 5) {
+                scrollIndicator.style.display = 'flex';
+                scrollIndicator.textContent = '▶︎';
+                scrollIndicator.style.left = 'auto';
+                scrollIndicator.style.right = '0';
+            }
+            // 左にスクロールできる場合
+            else if (currentScroll > 5) {
+                scrollIndicator.style.display = 'flex';
+                scrollIndicator.textContent = '◀︎';
+                scrollIndicator.style.left = '0';
+                scrollIndicator.style.right = 'auto';
+            }
+            // どちらにもスクロールできない場合
+            else {
+                scrollIndicator.style.display = 'none';
+            }
+        }
+        
+        // スクロールイベントを監視
+        if (navLinks) {
+            navLinks.addEventListener('scroll', updateScrollIndicator);
+            window.addEventListener('resize', updateScrollIndicator);
+            
+            // 初期表示
+            updateScrollIndicator();
+        }
+        
+        // インジケータークリックでスクロール
+        if (scrollIndicator) {
+            scrollIndicator.addEventListener('click', () => {
+                const scrollAmount = 200;
+                if (scrollIndicator.textContent === '▶︎') {
+                    navLinks.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                } else {
+                    navLinks.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                }
+            });
+        }
     </script>
 </body>
 </html>
