@@ -790,6 +790,16 @@
             window.location.href = `${page}?${params.toString()}`;
         }
         
+        function openScoresPage() {
+            const params = new URLSearchParams();
+            if (STAFF_API_URL) params.set('api', STAFF_API_URL);
+            
+            // HTMLファイル名を確認（all-scores.html または scores.html）
+            // ここでは all-scores.html を使用
+            const fileName = 'all-scores.html';
+            window.location.href = `${fileName}?${params.toString()}`;
+        }
+        
         async function fetchScores() {
             if (!STAFF_API_URL) {
                 document.getElementById('content').innerHTML = `
@@ -868,13 +878,20 @@
                 const games = courtGroups[court];
                 const gameNums = Object.keys(games).sort((a, b) => a - b);
                 
+                let hasPlayingGames = false;
+                
                 gameNums.forEach(gameNum => {
                     const teams = games[gameNum];
                     const status = teams[0].status || '待機';
                     
-                    let statusClass = 'waiting';
-                    if (status === '試合中') statusClass = 'playing';
-                    if (status === '終了') statusClass = 'finished';
+                    // トップページでは試合中の試合のみ表示
+                    if (status !== '試合中') {
+                        return;
+                    }
+                    
+                    hasPlayingGames = true;
+                    
+                    let statusClass = 'playing';
                     
                     const homeTeam = teams[0];
                     const awayTeam = teams[1];
@@ -900,6 +917,10 @@
                         </div>
                     `;
                 });
+                
+                if (!hasPlayingGames) {
+                    contentHtml += '<div style="padding: 40px; text-align: center; color: #666;">現在試合中の試合はありません</div>';
+                }
                 
                 contentHtml += '</div></div>';
             });
