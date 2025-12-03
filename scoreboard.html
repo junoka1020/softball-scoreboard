@@ -184,6 +184,19 @@
         .scoreboard {
             overflow-x: auto;
             padding: 20px;
+            position: relative;
+        }
+        
+        .scoreboard::before {
+            content: '';
+            position: sticky;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 10px;
+            background: white;
+            z-index: 4;
+            pointer-events: none;
         }
         
         table {
@@ -222,6 +235,7 @@
             left: 0;
             background: white;
             z-index: 2;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         }
         
         th.team-header {
@@ -229,6 +243,7 @@
             left: 0;
             background: #f8f8f8;
             z-index: 3;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         }
         
         .score-zero {
@@ -422,7 +437,7 @@
         </div>
         <div class="header-main">
             <nav class="nav-links" id="navLinks">
-                <a href="#" onclick="openPage('all-scores.html'); return false;">試合速報 / 試合結果</a>
+                <a href="#" onclick="openScoresPage(); return false;">試合速報 / 試合結果</a>
                 <a href="#" onclick="openPage('schedule.html'); return false;">大会スケジュール</a>
                 <a href="#" onclick="openPage('tournament.html'); return false;">トーナメント表</a>
                 <a href="#" onclick="openPage('teams.html'); return false;">チーム・選手一覧</a>
@@ -704,6 +719,12 @@
             window.location.href = `${page}?${params.toString()}`;
         }
         
+        function openScoresPage() {
+            const params = new URLSearchParams();
+            if (API_URL) params.set('api', API_URL);
+            window.location.href = `all-scores.html?${params.toString()}`;
+        }
+        
         fetchScores();
         setInterval(fetchScores, 60000);
         
@@ -737,11 +758,9 @@
                 scrollIndicator.style.left = 'auto';
                 scrollIndicator.style.right = '0';
             }
-            // 右端に到達した場合
+            // 左端にいる＋これ以上右にスクロールできない場合
             else {
-                scrollIndicator.textContent = '◀︎';
-                scrollIndicator.style.left = '0';
-                scrollIndicator.style.right = 'auto';
+                scrollIndicator.style.display = 'none';
             }
         }
         
