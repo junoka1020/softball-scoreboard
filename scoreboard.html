@@ -187,6 +187,19 @@
             position: relative;
         }
         
+        /* 🔧 左側のマスクを追加 - チーム列の幅+αをカバー */
+        .scoreboard::before {
+            content: '';
+            position: absolute;
+            left: 20px; /* paddingと同じ値 */
+            top: 20px;
+            bottom: 20px;
+            width: 120px; /* チーム列の幅と同じ */
+            background: white;
+            z-index: 9; /* チーム列より下、他のセルより上 */
+            pointer-events: none; /* クリックを通過させる */
+        }
+        
         table {
             width: 100%;
             border-collapse: separate; /* 🔧 separateに変更 */
@@ -228,20 +241,40 @@
             padding: 12px 15px;
             position: sticky;
             left: 0;
-            background: white !important; /* 🔧 !important追加 */
             z-index: 10;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            border-right: 2px solid #ddd !important; /* 🔧 右側に太めのボーダー */
+            border-right: 2px solid #ddd !important;
+        }
+        
+        /* 🔧 二重背景で確実に隠す */
+        .team-name::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: -1;
         }
         
         /* 🔧 修正: ヘッダーのチーム列も同様に */
         th.team-header {
             position: sticky;
             left: 0;
-            background: #f8f8f8 !important; /* 🔧 !important追加 */
             z-index: 11;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            border-right: 2px solid #ddd !important; /* 🔧 右側に太めのボーダー */
+            border-right: 2px solid #ddd !important;
+        }
+        
+        /* 🔧 ヘッダーも二重背景 */
+        th.team-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #f8f8f8;
+            z-index: -1;
         }
         
         .score-zero {
@@ -698,7 +731,7 @@
         }
         
         function openScoresPage() {
-            window.location.href = 'scoreboard.html';
+            window.location.href = 'all-scores.html';
         }
         
         fetchScores();
