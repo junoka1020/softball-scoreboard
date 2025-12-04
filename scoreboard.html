@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>試合速報/試合結果 | ソフトボール大会2025</title>
+    <title>試合速報/試合結果 | 2026年千葉県郵便局長ソフトボール大会</title>
     <style>
         * {
             margin: 0;
@@ -180,23 +180,11 @@
             50% { opacity: 0.7; }
         }
         
-        /* スコアボード */
+        /* スコアボード - 修正箇所 */
         .scoreboard {
             overflow-x: auto;
             padding: 20px;
             position: relative;
-        }
-        
-        .scoreboard::before {
-            content: '';
-            position: sticky;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 10px;
-            background: white;
-            z-index: 4;
-            pointer-events: none;
         }
         
         table {
@@ -224,6 +212,7 @@
             font-size: 1.1em;
         }
         
+        /* 🔧 修正: チーム名列の固定とz-index調整 */
         .team-name {
             text-align: left;
             font-weight: bold;
@@ -234,15 +223,16 @@
             position: sticky;
             left: 0;
             background: white;
-            z-index: 2;
+            z-index: 10; /* z-indexを上げて確実に上に表示 */
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         }
         
+        /* 🔧 修正: ヘッダーのチーム列もz-indexを調整 */
         th.team-header {
             position: sticky;
             left: 0;
             background: #f8f8f8;
-            z-index: 3;
+            z-index: 11; /* ヘッダーは更に上に */
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         }
         
@@ -431,7 +421,7 @@
                     <img src="https://drive.google.com/thumbnail?id=1i01jLSCnme9KdDuBwL8MufLNGdeo_d0x" alt="全国郵便局長会">
                 </a>
                 <div class="header-info">
-                    第25回大会 | 2025.12.7
+                    2026年千葉県郵便局長ソフトボール大会 | 2026.6.6
                 </div>
             </div>
         </div>
@@ -475,11 +465,7 @@
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const API_URL = urlParams.get('api') || localStorage.getItem('STAFF_BOT_API_URL') || '';
-        
-        if (urlParams.get('api')) {
-            localStorage.setItem('STAFF_BOT_API_URL', urlParams.get('api'));
-        }
+        const API_URL = urlParams.get('api') || '';
         
         let isRefreshing = false;
         let scheduleData = {};
@@ -488,7 +474,6 @@
         function formatTime(timeValue) {
             if (!timeValue) return '';
             
-            // 数値（Excelシリアル値）の場合
             if (typeof timeValue === 'number') {
                 const totalMinutes = Math.round(timeValue * 24 * 60);
                 const hours = Math.floor(totalMinutes / 60);
@@ -496,9 +481,7 @@
                 return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
             }
             
-            // 文字列の場合
             if (typeof timeValue === 'string') {
-                // ISO形式の日付文字列
                 if (timeValue.includes('T')) {
                     try {
                         const date = new Date(timeValue);
@@ -511,7 +494,6 @@
                     }
                 }
                 
-                // "HH:MM" 形式の場合
                 if (/^\d{1,2}:\d{2}$/.test(timeValue)) {
                     const [h, m] = timeValue.split(':');
                     return `${String(h).padStart(2, '0')}:${m}`;
@@ -538,7 +520,6 @@
                 
                 const data = await response.json();
                 
-                // スケジュールデータ取得
                 const scheduleResponse = await fetch(`${API_URL}?type=schedule&t=${timestamp}`, {
                     method: 'GET',
                     mode: 'cors',
@@ -590,7 +571,6 @@
                 return;
             }
             
-            // ゲームごとにグループ化
             const gameGroups = {};
             data.games.forEach(game => {
                 const key = `${game.court}-${game.gameNum}`;
@@ -605,7 +585,6 @@
                 gameGroups[key].teams.push(game);
             });
             
-            // ゲーム番号順にソート
             const sortedGames = Object.values(gameGroups).sort((a, b) => a.gameNum - b.gameNum);
             
             let html = '';
@@ -614,7 +593,6 @@
                 const statusClass = gameData.status === '試合中' ? 'playing' :
                                    gameData.status === '終了' ? 'finished' : 'waiting';
                 
-                // 特別な試合のラベル
                 let specialLabel = '';
                 if (gameData.court === 'B' && gameData.gameNum === 6) {
                     specialLabel = ' <span style="color: #ffc107;">🥉 3位決定戦</span>';
@@ -630,7 +608,6 @@
                         </div>
                 `;
                 
-                // 試合前の場合
                 if (gameData.status === '待機' && (!gameData.teams[0].innings || gameData.teams[0].innings.every(s => s === null || s === undefined || s === ''))) {
                     const schedule = scheduleData[gameData.gameNum];
                     const startTime = schedule ? formatTime(schedule.time) : '';
@@ -642,9 +619,7 @@
                             <div class="status-message-subtext">${gameData.teams[0].team} vs ${gameData.teams[1].team}</div>
                         </div>
                     `;
-                }
-                // 試合中または終了の場合
-                else {
+                } else {
                     const team1 = gameData.teams[0];
                     const team2 = gameData.teams[1];
                     const inningsCount = team1.innings ? team1.innings.length : 0;
@@ -691,7 +666,6 @@
                             </table>
                         </div>`;
                     
-                    // 試合中の場合は追加メッセージ
                     if (gameData.status === '試合中') {
                         html += `
                             <div class="status-message" style="padding: 20px;">
@@ -708,27 +682,20 @@
         }
         
         function goBack() {
-            const params = new URLSearchParams();
-            if (API_URL) params.set('staff_api', API_URL);
-            window.location.href = `index.html?${params.toString()}`;
+            window.location.href = 'index.html';
         }
         
         function openPage(page) {
-            const params = new URLSearchParams();
-            if (API_URL) params.set('api', API_URL);
-            window.location.href = `${page}?${params.toString()}`;
+            window.location.href = page;
         }
         
         function openScoresPage() {
-            const params = new URLSearchParams();
-            if (API_URL) params.set('api', API_URL);
-            window.location.href = `all-scores.html?${params.toString()}`;
+            window.location.href = 'all-scores.html';
         }
         
         fetchScores();
         setInterval(fetchScores, 60000);
         
-        // スクロールインジケーターの制御
         const navLinks = document.getElementById('navLinks');
         const scrollIndicator = document.getElementById('scrollIndicator');
         
@@ -738,7 +705,6 @@
             const maxScroll = navLinks.scrollWidth - navLinks.clientWidth;
             const currentScroll = navLinks.scrollLeft;
             
-            // スクロールが必要ない場合は非表示
             if (maxScroll <= 0) {
                 scrollIndicator.style.display = 'none';
                 return;
@@ -746,34 +712,25 @@
             
             scrollIndicator.style.display = 'flex';
             
-            // 左にスクロールできる場合（左端にいない場合）
             if (currentScroll > 5) {
                 scrollIndicator.textContent = '◀︎';
                 scrollIndicator.style.left = '0';
                 scrollIndicator.style.right = 'auto';
-            }
-            // 右にスクロールできる場合（右端にいない場合）
-            else if (currentScroll < maxScroll - 5) {
+            } else if (currentScroll < maxScroll - 5) {
                 scrollIndicator.textContent = '▶︎';
                 scrollIndicator.style.left = 'auto';
                 scrollIndicator.style.right = '0';
-            }
-            // 左端にいる＋これ以上右にスクロールできない場合
-            else {
+            } else {
                 scrollIndicator.style.display = 'none';
             }
         }
         
-        // スクロールイベントを監視
         if (navLinks) {
             navLinks.addEventListener('scroll', updateScrollIndicator);
             window.addEventListener('resize', updateScrollIndicator);
-            
-            // 初期表示
             updateScrollIndicator();
         }
         
-        // インジケータークリックでスクロール
         if (scrollIndicator) {
             scrollIndicator.addEventListener('click', () => {
                 const scrollAmount = 200;
