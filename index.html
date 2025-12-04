@@ -247,6 +247,7 @@
             cursor: pointer;
             transition: all 0.3s;
             border-top: 3px solid transparent;
+            flex: 1;
         }
         
         .tab.active {
@@ -594,6 +595,12 @@
         <h2 class="section-title" style="margin-top: 60px;">大会情報</h2>
         
         <div class="quick-links">
+            <a href="#" onclick="openPage('scoreboard.html'); return false;" class="link-card">
+                <div class="link-icon">⚡</div>
+                <div class="link-title">試合速報 / 試合結果</div>
+                <div class="link-description">リアルタイムスコア</div>
+            </a>
+            
             <a href="#" onclick="openPage('schedule.html'); return false;" class="link-card">
                 <div class="link-icon">📅</div>
                 <div class="link-title">大会スケジュール</div>
@@ -608,25 +615,25 @@
             
             <a href="#" onclick="openPage('teams.html'); return false;" class="link-card">
                 <div class="link-icon">👥</div>
-                <div class="link-title">チーム一覧</div>
+                <div class="link-title">チーム・選手一覧</div>
                 <div class="link-description">参加チーム紹介</div>
-            </a>
-            
-            <a href="#" onclick="openPage('rules.html'); return false;" class="link-card">
-                <div class="link-icon">📋</div>
-                <div class="link-title">大会ルール</div>
-                <div class="link-description">競技規則・注意事項</div>
             </a>
             
             <a href="#" onclick="openPage('venue.html'); return false;" class="link-card">
                 <div class="link-icon">📍</div>
-                <div class="link-title">会場案内</div>
+                <div class="link-title">会場案内・アクセス</div>
                 <div class="link-description">アクセス・施設情報</div>
+            </a>
+            
+            <a href="#" onclick="openPage('rules.html'); return false;" class="link-card">
+                <div class="link-icon">📋</div>
+                <div class="link-title">大会ルール・規約</div>
+                <div class="link-description">競技規則・注意事項</div>
             </a>
             
             <a href="#" onclick="openPage('history.html'); return false;" class="link-card">
                 <div class="link-icon">🥇</div>
-                <div class="link-title">優勝記録</div>
+                <div class="link-title">優勝記録・歴史</div>
                 <div class="link-description">歴代優勝チーム</div>
             </a>
         </div>
