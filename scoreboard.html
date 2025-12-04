@@ -189,7 +189,8 @@
         
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate; /* 🔧 separateに変更 */
+            border-spacing: 0; /* 🔧 間隔をゼロに */
             min-width: 600px;
         }
         
@@ -197,6 +198,11 @@
             padding: 12px 8px;
             text-align: center;
             border: 1px solid #ddd;
+            border-left: none; /* 🔧 左ボーダーを削除 */
+        }
+        
+        th:first-child, td:first-child {
+            border-left: 1px solid #ddd; /* 🔧 最初のセルだけ左ボーダー */
         }
         
         th {
@@ -212,7 +218,7 @@
             font-size: 1.1em;
         }
         
-        /* 🔧 修正: チーム名列の固定とz-index調整 */
+        /* 🔧 修正: チーム名列の固定と完全な背景 */
         .team-name {
             text-align: left;
             font-weight: bold;
@@ -222,18 +228,20 @@
             padding: 12px 15px;
             position: sticky;
             left: 0;
-            background: white;
-            z-index: 99; /* z-indexを上げて確実に上に表示 */
+            background: white !important; /* 🔧 !important追加 */
+            z-index: 10;
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            border-right: 2px solid #ddd !important; /* 🔧 右側に太めのボーダー */
         }
         
-        /* 🔧 修正: ヘッダーのチーム列もz-indexを調整 */
+        /* 🔧 修正: ヘッダーのチーム列も同様に */
         th.team-header {
             position: sticky;
             left: 0;
-            background: #f8f8f8;
-            z-index: 100; /* ヘッダーは更に上に */
+            background: #f8f8f8 !important; /* 🔧 !important追加 */
+            z-index: 11;
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            border-right: 2px solid #ddd !important; /* 🔧 右側に太めのボーダー */
         }
         
         .score-zero {
@@ -427,7 +435,7 @@
         </div>
         <div class="header-main">
             <nav class="nav-links" id="navLinks">
-                <a href="#" onclick="openPage('scoreboard.html'); return false;">試合速報 / 試合結果</a>
+                <a href="#" onclick="openScoresPage(); return false;">試合速報 / 試合結果</a>
                 <a href="#" onclick="openPage('schedule.html'); return false;">大会スケジュール</a>
                 <a href="#" onclick="openPage('tournament.html'); return false;">トーナメント表</a>
                 <a href="#" onclick="openPage('teams.html'); return false;">チーム・選手一覧</a>
