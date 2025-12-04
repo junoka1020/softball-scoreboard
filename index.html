@@ -810,9 +810,7 @@
             const params = new URLSearchParams();
             if (STAFF_API_URL) params.set('api', STAFF_API_URL);
             
-            // HTMLファイル名を確認（all-scores.html または scores.html）
-            // ここでは all-scores.html を使用
-            const fileName = 'all-scores.html';
+            const fileName = 'scoreboard.html';
             window.location.href = `${fileName}?${params.toString()}`;
         }
         
