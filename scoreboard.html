@@ -181,30 +181,31 @@
             50% { opacity: 0.7; }
         }
         
-        /* スコアボード - 修正箇所 */
+        /* ========================================
+           スコアボード修正箇所
+           ========================================
+        */
+
+        /* 1. 外枠のWrapperを作成し、ここにpaddingを設定 */
+        .scoreboard-wrapper {
+            padding: 20px;
+            overflow: hidden; /* コンテナ外への影響を防ぐ */
+        }
+
+        /* 2. scrollable要素からはpaddingを削除 */
         .scoreboard {
             overflow-x: auto;
-            padding: 20px;
+            padding: 0;
             position: relative;
+            width: 100%;
         }
         
-        /* 🔧 左側のマスクを追加 - チーム列の幅+αをカバー */
-        .scoreboard::before {
-            content: '';
-            position: absolute;
-            left: 20px; /* paddingと同じ値 */
-            top: 20px;
-            bottom: 20px;
-            width: 120px; /* チーム列の幅と同じ */
-            background: white;
-            z-index: 9; /* チーム列より下、他のセルより上 */
-            pointer-events: none; /* クリックを通過させる */
-        }
+        /* 赤いマスク(.scoreboard::before)は削除済み */
         
         table {
             width: 100%;
-            border-collapse: separate; /* 🔧 separateに変更 */
-            border-spacing: 0; /* 🔧 間隔をゼロに */
+            border-collapse: separate;
+            border-spacing: 0;
             min-width: 600px;
         }
         
@@ -212,13 +213,11 @@
             padding: 12px 8px;
             text-align: center;
             border: 1px solid #ddd;
-            border-left: none;
-            position: relative; /* 🔧 追加 */
-            z-index: 1; /* 🔧 カバーより下 */
+            border-left: none; /* 基本的に左ボーダーなし */
         }
         
         th:first-child, td:first-child {
-            border-left: 1px solid #ddd; /* 🔧 最初のセルだけ左ボーダー */
+            border-left: 1px solid #ddd; /* 左端のみボーダーあり */
         }
         
         th {
@@ -234,7 +233,9 @@
             font-size: 1.1em;
         }
         
-        /* 🔧 修正: チーム名列の固定と完全な背景 */
+        /* 3. 固定列のスタイル修正
+           z-indexを適切に設定し、背景色を明示して裏写りを防ぐ
+        */
         .team-name {
             text-align: left;
             font-weight: bold;
@@ -242,44 +243,33 @@
             width: 120px;
             min-width: 120px;
             padding: 12px 15px;
+            
+            /* Sticky設定 */
             position: sticky;
             left: 0;
-            z-index: 10;
+            z-index: 10; /* 通常セルより上 */
+            
+            /* 背景色を明示（裏のデータが透けないように） */
+            background-color: white !important;
+            
+            /* 右側のボーダーをここで確保 */
             border-right: 2px solid #ddd !important;
         }
         
-        /* 🔧 二重背景で確実に隠す */
-        .team-name::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: white;
-            z-index: -1;
-        }
-        
-        /* 🔧 修正: ヘッダーのチーム列も同様に */
+        /* 固定列ヘッダー */
         th.team-header {
             position: sticky;
             left: 0;
-            z-index: 11;
+            z-index: 11; /* team-nameよりさらに上（ヘッダーかつ固定） */
+            
+            /* ヘッダー色を明示 */
+            background-color: #f8f8f8 !important;
+            
             border-right: 2px solid #ddd !important;
         }
         
-        /* 🔧 ヘッダーも二重背景 */
-        th.team-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #f8f8f8;
-            z-index: -1;
-        }
-        
+        /* ::before ハックは全て削除済み */
+
         .score-zero {
             color: #999;
         }
@@ -444,6 +434,7 @@
             
             .team-name {
                 min-width: 80px;
+                width: 80px; /* SPでも固定幅を指定 */
                 font-size: 0.9em;
             }
             
@@ -668,21 +659,25 @@
                     const team2 = gameData.teams[1];
                     const inningsCount = team1.innings ? team1.innings.length : 0;
                     
+                    /* HTML修正箇所:
+                       .scoreboardの外側を.scoreboard-wrapperで囲む構造に変更
+                    */
                     html += `
-                        <div class="scoreboard">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th class="team-header">チーム</th>`;
+                        <div class="scoreboard-wrapper">
+                            <div class="scoreboard">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th class="team-header">チーム</th>`;
                     
                     for (let i = 1; i <= inningsCount; i++) {
                         html += `<th>${i}</th>`;
                     }
                     
                     html += `<th>合計</th>
-                                    </tr>
-                                </thead>
-                                <tbody>`;
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
                     
                     gameData.teams.forEach(team => {
                         html += `
@@ -706,9 +701,11 @@
                     });
                     
                     html += `
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>`;
+                    /* 修正箇所終了 */
                     
                     if (gameData.status === '試合中') {
                         html += `
