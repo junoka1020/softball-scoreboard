@@ -136,6 +136,20 @@
             overflow: hidden;
             margin-bottom: 30px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: relative; /* 🔧 追加 */
+        }
+        
+        /* 🔧 各試合カードの左側に白いカバーを配置 */
+        .game-section::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 20px;
+            background: white;
+            z-index: 100;
+            pointer-events: none;
         }
         
         .game-section-header {
