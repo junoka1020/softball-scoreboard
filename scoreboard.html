@@ -136,20 +136,7 @@
             overflow: hidden;
             margin-bottom: 30px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            position: relative; /* 🔧 追加 */
-        }
-        
-        /* 🔧 各試合カードの左側に白いカバーを配置 */
-        .game-section::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 20px;
-            background: red; /* 🔧 確認用に赤色 */
-            z-index: 100;
-            pointer-events: none;
+            position: relative;
         }
         
         .game-section-header {
@@ -225,7 +212,9 @@
             padding: 12px 8px;
             text-align: center;
             border: 1px solid #ddd;
-            border-left: none; /* 🔧 左ボーダーを削除 */
+            border-left: none;
+            position: relative; /* 🔧 追加 */
+            z-index: 1; /* 🔧 カバーより下 */
         }
         
         th:first-child, td:first-child {
