@@ -727,7 +727,9 @@
         }
         
         function openPage(page) {
-            window.location.href = page;
+            const params = new URLSearchParams();
+            if (STAFF_API_URL) params.set('api', STAFF_API_URL);
+            window.location.href = `${page}?${params.toString()}`;
         }
         
         fetchScores();
